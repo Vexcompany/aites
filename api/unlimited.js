@@ -45,33 +45,42 @@ module.exports = async function handler(req, res) {
     const response = await axios.post(url, requestData, { 
       headers,
       timeout: 30000,
-      responseType: 'text'
+      responseType: 'text',
+      validateStatus: () => true
     });
+    
+    // Debug log
+    console.log('Response status:', response.status);
+    console.log('Response preview:', response.data.substring(0, 500));
     
     let responseText = '';
     const lines = response.data.toString().split('\n');
     
     for (const line of lines) {
       const trimmed = line.trim();
-      if (!trimmed) continue;
+      if (!trimmed || !trimmed.includes('"diff"')) continue;
       
-      if (trimmed.includes('"diff"')) {
-        try {
-          const jsonMatch = trimmed.match(/\d+:(.+)/);
-          if (jsonMatch) {
-            const data = JSON.parse(jsonMatch[1]);
-            if (data.diff && Array.isArray(data.diff) && data.diff[1]) {
-              responseText += data.diff[1];
-            }
+      try {
+        // Format: 1:{"diff":[0,"text"]}
+        const match = trimmed.match(/^(\d+):(.+)$/);
+        if (match) {
+          const data = JSON.parse(match[2]);
+          if (data.diff && data.diff[1]) {
+            responseText += data.diff[1];
           }
-        } catch (e) {
-          continue;
         }
+      } catch (e) {
+        console.log('Parse error:', e.message);
+        continue;
       }
     }
     
     if (!responseText) {
-      throw new Error('Tidak dapat mengekstrak respons dari AI');
+      return res.status(200).json({ 
+        success: true, 
+        response: "Maaf, tidak dapat memproses respons dari server.",
+        raw: response.data.substring(0, 1000)
+      });
     }
     
     res.status(200).json({ success: true, response: responseText });
@@ -81,7 +90,7 @@ module.exports = async function handler(req, res) {
     res.status(500).json({ 
       success: false, 
       error: error.message,
-      details: error.response?.data?.toString().substring(0, 200)
+      stack: error.stack
     });
   }
 };

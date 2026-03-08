@@ -1,7 +1,7 @@
-import axios from 'axios';
-import { handleCors } from './_utils/cors.js';
+const axios = require('axios');
+const { handleCors } = require('./_utils/cors.js');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   handleCors(res);
   
   if (req.method === 'OPTIONS') return res.status(200).end();
@@ -13,7 +13,6 @@ export default async function handler(req, res) {
   const ENDPOINT = 'https://chat-deep.ai/wp-admin/admin-ajax.php';
 
   try {
-    // Fetch nonce
     const nonceRes = await axios.get(BASE_URL, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
@@ -49,7 +48,6 @@ export default async function handler(req, res) {
 
     const rawContent = response.data?.data?.response || response.data?.response || "";
     
-    // Parse thinking process
     const thinkMatch = rawContent.match(/<think>([\s\S]*?)<\/think>/i);
     const think = thinkMatch ? thinkMatch[1].trim() : null;
     const cleanResponse = rawContent.replace(/<think>[\s\S]*?<\/think>/i, '').trim();
@@ -64,4 +62,4 @@ export default async function handler(req, res) {
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
-}
+};

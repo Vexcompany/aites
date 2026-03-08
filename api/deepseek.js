@@ -1,5 +1,3 @@
-const axios = require('axios');
-
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -13,17 +11,17 @@ module.exports = async function handler(req, res) {
   
   try {
     // Get nonce
-    const nonceRes = await axios.get('https://chat-deep.ai', {
+    const nonceRes = await fetch('https://chat-deep.ai', {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-      },
-      timeout: 10000
+      }
     });
     
-    const nonceMatch = nonceRes.data.match(/"nonce":"([a-f0-9]+)"/);
+    const nonceHtml = await nonceRes.text();
+    const nonceMatch = nonceHtml.match(/"nonce":"([a-f0-9]+)"/);
     if (!nonceMatch) throw new Error('NONCE_NOT_FOUND');
     
-    const payload = new URLSearchParams({
+    const params = new URLSearchParams({
       action: 'deepseek_chat',
       message: message,
       model: mode === "think" ? "deepseek-chat" : "deepseek-reasoner",
@@ -32,7 +30,8 @@ module.exports = async function handler(req, res) {
       session_only: '1'
     });
 
-    const response = await axios.post('https://chat-deep.ai/wp-admin/admin-ajax.php', payload.toString(), {
+    const response = await fetch('https://chat-deep.ai/wp-admin/admin-ajax.php', {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
         'X-Requested-With': 'XMLHttpRequest',
@@ -40,10 +39,12 @@ module.exports = async function handler(req, res) {
         'Referer': 'https://chat-deep.ai/',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
       },
-      timeout: 60000
+      body: params.toString()
     });
 
-    const rawContent = response.data?.data?.response || response.data?.response || "";
+    const data = await response.json();
+    const rawContent = data?.data?.response || data?.response || "";
+    
     const thinkMatch = rawContent.match(/<think>([\s\S]*?)<\/think>/i);
     
     res.status(200).json({
@@ -53,7 +54,7 @@ module.exports = async function handler(req, res) {
     });
     
   } catch (error) {
-    console.error('DeepSeek Error:', error.message);
+    console.error('DeepSeek Error:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 };

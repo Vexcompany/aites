@@ -1,7 +1,8 @@
-import axios from 'axios';
-import { handleCors } from './_utils/cors.js';
+const axios = require('axios');
+const { handleCors } = require('./_utils/cors.js');
+const crypto = require('crypto');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   handleCors(res);
   
   if (req.method === 'OPTIONS') return res.status(200).end();
@@ -46,4 +47,4 @@ export default async function handler(req, res) {
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
-}
+};

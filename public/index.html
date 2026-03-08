@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagaska AI - Asisten Cerdas Anda</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.2/marked.min.js"></script>
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .message-bubble {
+            max-width: 80%;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .typing-indicator span {
+            animation: blink 1.4s infinite both;
+        }
+        
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes blink {
+            0%, 80%, 100% { opacity: 0; }
+            40% { opacity: 1; }
+        }
+        
+        .model-card {
+            transition: all 0.3s ease;
+        }
+        
+        .model-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        
+        .model-card.active {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #4a4a4a;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #5a5a5a;
+        }
+        
+        .code-block {
+            position: relative;
+        }
+        
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .code-block:hover .copy-btn {
+            opacity: 1;
+        }
+        
+        .thinking-box {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%);
+            border-left: 4px solid #60a5fa;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white h-screen overflow-hidden">
+    <div class="flex h-full">
+        <!-- Sidebar -->
+        <aside class="w-80 bg-gray-800 border-r border-gray-700 flex flex-col hidden md:flex">
+            <div class="p-6 border-b border-gray-700">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-10 h-10 gradient-bg rounded-xl flex items-center justify-center shadow-lg">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                            Pagaska AI
+                        </h1>
+                        <p class="text-xs text-gray-400">Powered by Multiple Engines</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Model Selection -->
+            <div class="p-4 space-y-3 overflow-y-auto flex-1">
+                <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Pilih Model AI</h3>
+                
+                <div class="model-card active cursor-pointer p-4 rounded-xl border border-gray-600 bg-gray-700/50" onclick="selectModel('unlimited')">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-2">
+                            <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                            <span class="font-semibold text-sm">Unlimited AI</span>
+                        </div>
+                        <span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded-full">Online</span>
+                    </div>
+                    <p class="text-xs text-gray-400">Model reasoning dengan konteks panjang</p>
+                </div>
+
+                <div class="model-card cursor-pointer p-4 rounded-xl border border-gray-600 bg-gray-700/50" onclick="selectModel('pixel')">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-2">
+                            <div class="w-2 h-2 bg-blue-400 rounded-full"></div>
+                            <span class="font-semibold text-sm">Pixel Chat</span>
+                        </div>
+                        <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded-full">Karacter</span>
+                    </div>
+                    <p class="text-xs text-gray-400">AI dengan personality karakter</p>
+                </div>
+
+                <div class="model-card cursor-pointer p-4 rounded-xl border border-gray-600 bg-gray-700/50" onclick="selectModel('deepseek')">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-2">
+                            <div class="w-2 h-2 bg-purple-400 rounded-full"></div>
+                            <span class="font-semibold text-sm">DeepSeek</span>
+                        </div>
+                        <span class="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded-full">Think/Flash</span>
+                    </div>
+                    <p class="text-xs text-gray-400">Deep reasoning dengan thinking process</p>
+                </div>
+            </div>
+
+            <!-- New Chat Button -->
+            <div class="p-4 border-t border-gray-700">
+                <button onclick="newChat()" class="w-full py-3 px-4 bg-gray-700 hover:bg-gray-600 rounded-xl flex items-center justify-center gap-2 transition-colors border border-gray-600">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    <span class="font-medium">Chat Baru</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="flex-1 flex flex-col bg-gray-900 relative">
+            <!-- Header -->
+            <header class="h-16 border-b border-gray-700 flex items-center justify-between px-6 bg-gray-800/50 backdrop-blur-sm">
+                <div class="flex items-center gap-3">
+                    <button class="md:hidden p-2 hover:bg-gray-700 rounded-lg" onclick="toggleSidebar()">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </button>
+                    <div>
+                        <h2 class="font-semibold" id="currentModel">Unlimited AI</h2>
+                        <p class="text-xs text-gray-400" id="modelStatus">Siap membantu</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="clearChat()" class="p-2 hover:bg-gray-700 rounded-lg text-gray-400 hover:text-white transition-colors" title="Hapus percakapan">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Chat Messages -->
+            <div id="chatContainer" class="flex-1 overflow-y-auto p-6 space-y-6">
+                <!-- Welcome Message -->
+                <div class="text-center py-12">
+                    <div class="w-20 h-20 gradient-bg rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-2xl">
+                        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                        </svg>
+                    </div>
+                    <h2 class="text-3xl font-bold mb-3">Selamat datang di Pagaska AI</h2>
+                    <p class="text-gray-400 max-w-md mx-auto mb-8">
+                        Asisten AI canggih dengan multiple engine. Pilih model di sidebar dan mulai percakapan Anda.
+                    </p>
+                    <div class="flex flex-wrap justify-center gap-3 max-w-2xl">
+                        <button onclick="setQuickPrompt('Jelaskan tentang kecerdasan buatan')" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-full text-sm border border-gray-700 transition-colors">
+                            "Jelaskan tentang kecerdasan buatan"
+                        </button>
+                        <button onclick="setQuickPrompt('Bantu saya menulis kode JavaScript')" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-full text-sm border border-gray-700 transition-colors">
+                            "Bantu saya menulis kode"
+                        </button>
+                        <button onclick="setQuickPrompt('Terjemahkan ke bahasa Inggris')" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-full text-sm border border-gray-700 transition-colors">
+                            "Terjemahkan ke bahasa Inggris"
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="border-t border-gray-700 p-4 bg-gray-800/30 backdrop-blur-sm">
+                <div class="max-w-4xl mx-auto relative">
+                    <div class="relative flex items-end gap-2 bg-gray-800 rounded-2xl border border-gray-600 p-2 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 transition-all">
+                        <textarea 
+                            id="messageInput" 
+                            rows="1"
+                            class="flex-1 bg-transparent text-white placeholder-gray-400 resize-none outline-none px-3 py-3 max-h-32"
+                            placeholder="Ketik pesan Anda di sini..."
+                            onkeydown="handleKeyDown(event)"
+                            oninput="autoResize(this)"
+                        ></textarea>
+                        <button 
+                            onclick="sendMessage()" 
+                            id="sendBtn"
+                            class="p-3 gradient-bg rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <p class="text-xs text-gray-500 text-center mt-2">
+                        Pagaska AI dapat membuat kesalahan. Verifikasi informasi penting.
+                    </p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Mobile Sidebar Overlay -->
+    <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden" onclick="toggleSidebar()"></div>
+
+    <script>
+        // State Management
+        let currentModel = 'unlimited';
+        let isGenerating = false;
+        let chatHistory = [];
+        let conversationId = null;
+        let characterId = "6472508d-5763-415d-8d8e-db48c7fbd05a"; // Default character ID
+
+        // Model Configurations
+        const modelConfigs = {
+            unlimited: {
+                name: 'Unlimited AI',
+                description: 'Model reasoning dengan konteks panjang',
+                endpoint: 'https://app.unlimitedai.chat/chat/',
+                chatId: 'e6d80bed-6b42-4ea0-a5ac-01d4e9175ee1'
+            },
+            pixel: {
+                name: 'Pixel Chat',
+                description: 'AI dengan personality karakter',
+                endpoint: 'https://prod.nd-api.com/chat',
+                characterId: '6472508d-5763-415d-8d8e-db48c7fbd05a'
+            },
+            deepseek: {
+                name: 'DeepSeek',
+                description: 'Deep reasoning dengan thinking process',
+                endpoint: 'https://chat-deep.ai/wp-admin/admin-ajax.php',
+                mode: 'flash' // 'think' or 'flash'
+            }
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            marked.setOptions({
+                highlight: function(code, lang) {
+                    if (lang && hljs.getLanguage(lang)) {
+                        return hljs.highlight(code, { language: lang }).value;
+                    }
+                    return hljs.highlightAuto(code).value;
+                },
+                breaks: true
+            });
+        });
+
+        // Model Selection
+        function selectModel(model) {
+            currentModel = model;
+            
+            // Update UI
+            document.querySelectorAll('.model-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+            
+            // Update header
+            document.getElementById('currentModel').textContent = modelConfigs[model].name;
+            document.getElementById('modelStatus').textContent = modelConfigs[model].description;
+            
+            // Close mobile sidebar
+            if (window.innerWidth < 768) {
+                toggleSidebar();
+            }
+        }
+
+        // Toggle Sidebar (Mobile)
+        function toggleSidebar() {
+            const sidebar = document.querySelector('aside');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('hidden');
+            overlay.classList.toggle('hidden');
+        }
+
+        // Auto-resize textarea
+        function autoResize(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 128) + 'px';
+        }
+
+        // Handle Enter key
+        function handleKeyDown(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        }
+
+        // Quick Prompt
+        function setQuickPrompt(text) {
+            document.getElementById('messageInput').value = text;
+            autoResize(document.getElementById('messageInput'));
+            document.getElementById('messageInput').focus();
+        }
+
+        // Add Message to UI
+        function addMessage(content, isUser = false, isThinking = false) {
+            const container = document.getElementById('chatContainer');
+            
+            // Remove welcome message if exists
+            if (container.querySelector('.text-center')) {
+                container.innerHTML = '';
+            }
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `flex ${isUser ? 'justify-end' : 'justify-start'} message-bubble`;
+            
+            if (isThinking) {
+                messageDiv.innerHTML = `
+                    <div class="thinking-box rounded-2xl p-4 max-w-3xl">
+                        <div class="flex items-center gap-2 mb-2 text-blue-300">
+                            <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16z"></path>
+                            </svg>
+                            <span class="text-sm font-medium">Sedang berpikir...</span>
+                        </div>
+                        <div class="text-sm text-gray-300 font-mono whitespace-pre-wrap">${content}</div>
+                    </div>
+                `;
+            } else {
+                const parsedContent = isUser ? content : marked.parse(content);
+                messageDiv.innerHTML = `
+                    <div class="${isUser ? 'gradient-bg text-white' : 'bg-gray-800 border border-gray-700'} rounded-2xl p-4 max-w-3xl shadow-lg">
+                        <div class="prose prose-invert max-w-none">
+                            ${isUser ? `<p class="m-0">${escapeHtml(content)}</p>` : parsedContent}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+            
+            // Apply syntax highlighting
+            messageDiv.querySelectorAll('pre code').forEach((block) => {
+                hljs.highlightBlock(block);
+            });
+            
+            return messageDiv;
+        }
+
+        // Escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Show Typing Indicator
+        function showTyping() {
+            const container = document.getElementById('chatContainer');
+            const typingDiv = document.createElement('div');
+            typingDiv.id = 'typingIndicator';
+            typingDiv.className = 'flex justify-start message-bubble';
+            typingDiv.innerHTML = `
+                <div class="bg-gray-800 border border-gray-700 rounded-2xl p-4 flex items-center gap-1">
+                    <div class="typing-indicator flex gap-1">
+                        <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
+                        <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
+                        <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
+                    </div>
+                </div>
+            `;
+            container.appendChild(typingDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // Remove Typing Indicator
+        function removeTyping() {
+            const indicator = document.getElementById('typingIndicator');
+            if (indicator) indicator.remove();
+        }
+
+async function sendMessage() {
+    const input = document.getElementById('messageInput');
+    const message = input.value.trim();
+    
+    if (!message || isGenerating) return;
+    
+    addMessage(message, true);
+    input.value = '';
+    input.style.height = 'auto';
+    
+    showTyping();
+    isGenerating = true;
+    document.getElementById('sendBtn').disabled = true;
+    
+    try {
+        let response;
+        const endpoint = `/api/${currentModel}`;
+        
+        const body = { message };
+        if (currentModel === 'pixel') {
+            body.characterId = modelConfigs.pixel.characterId;
+            body.conversationId = conversationId;
+        } else if (currentModel === 'deepseek') {
+            body.mode = document.getElementById('deepseekMode')?.value || 'flash';
+        }
+        
+        const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+        
+        response = await res.json();
+        removeTyping();
+        
+        if (!response.success) {
+            throw new Error(response.error);
+        }
+        
+        // Handle response
+        if (currentModel === 'pixel') {
+            conversationId = response.conversation_id;
+            addMessage(response.message, false);
+        } else if (currentModel === 'deepseek' && response.think) {
+            addMessage(response.think, false, true);
+            addMessage(response.response, false);
+        } else {
+            addMessage(response.response, false);
+        }
+        
+    } catch (error) {
+        removeTyping();
+        addMessage(`❌ Error: ${error.message}`, false);
+    } finally {
+        isGenerating = false;
+        document.getElementById('sendBtn').disabled = false;
+    }
+}
+
+        // API: Unlimited AI
+        async function sendUnlimitedAI(message) {
+            const config = modelConfigs.unlimited;
+            const url = `${config.endpoint}${config.chatId}`;
+            
+            const requestData = [{
+                chatId: config.chatId,
+                messages: [{
+                    id: generateUUID(),
+                    role: "user",
+                    content: message,
+                    parts: [{ type: "text", text: message }],
+                    createdAt: new Date().toISOString()
+                }, {
+                    id: generateUUID(),
+                    role: "assistant",
+                    content: "",
+                    parts: [{ type: "text", text: "" }],
+                    createdAt: new Date().toISOString()
+                }],
+                selectedChatModel: "chat-model-reasoning",
+                selectedCharacter: null,
+                selectedStory: null
+            }];
+
+            // Note: This is a simulation. In real implementation, you need CORS proxy or backend
+            return simulateResponse(message, "Unlimited AI");
+        }
+
+        // API: Pixel Chat
+        async function sendPixelChat(message) {
+            const config = modelConfigs.pixel;
+            
+            const requestData = {
+                conversation_id: conversationId,
+                character_id: config.characterId,
+                language: "id",
+                inference_model: "default",
+                inference_settings: {
+                    max_new_tokens: 180,
+                    temperature: 0.7,
+                    top_p: 0.7,
+                    top_k: 90
+                },
+                autopilot: false,
+                continue_chat: false,
+                message: message
+            };
+
+            // Note: This is a simulation. In real implementation, you need CORS proxy or backend
+            return simulateResponse(message, "Pixel Chat");
+        }
+
+        // API: DeepSeek
+        async function sendDeepSeek(message) {
+            const config = modelConfigs.deepseek;
+            
+            // Simulate thinking process
+            await new Promise(r => setTimeout(r, 1000));
+            
+            return {
+                think: `Analyzing query about "${message.substring(0, 30)}..."\n- Identifying key concepts\n- Formulating comprehensive response\n- Structuring output for clarity`,
+                response: `Berikut adalah respons untuk pertanyaan Anda: **"${message}"**\n\nSaya telah menganalisis pertanyaan Anda dan ini adalah jawaban detailnya. Dalam implementasi nyata, ini akan terhubung ke API DeepSeek untuk mendapatkan respons yang sebenarnya dengan kemampuan reasoning yang kuat.\n\n\`\`\`javascript\n// Contoh kode yang mungkin dihasilkan\nfunction processQuery(query) {\n    return analyze(query);\n}\n\`\`\``
+            };
+        }
+
+        // Simulation (Replace with actual API calls)
+        function simulateResponse(message, modelName) {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve({
+                        response: `Halo! Saya ${modelName} dari Pagaska AI. Anda mengirim: "${message}"\n\nIni adalah simulasi respons. Untuk implementasi produksi, Anda perlu:\n\n1. **Backend Server**: Buat Node.js/PHP proxy untuk menghindari CORS\n2. **API Keys**: Daftar dan gunakan API key yang valid\n3. **Rate Limiting**: Implementasi batasan penggunaan\n\nContoh struktur respons:\n- **Model**: ${modelName}\n- **Timestamp**: ${new Date().toLocaleString('id-ID')}\n- **Status**: Success`
+                    });
+                }, 1500);
+            });
+        }
+
+        // Utility: Generate UUID
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        // New Chat
+        function newChat() {
+            document.getElementById('chatContainer').innerHTML = `
+                <div class="text-center py-12">
+                    <div class="w-20 h-20 gradient-bg rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-2xl">
+                        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                        </svg>
+                    </div>
+                    <h2 class="text-3xl font-bold mb-3">Chat Baru Dimulai</h2>
+                    <p class="text-gray-400 max-w-md mx-auto">
+                        Percakapan sebelumnya telah dihapus. Mulai percakapan baru dengan ${modelConfigs[currentModel].name}.
+                    </p>
+                </div>
+            `;
+            conversationId = null;
+            chatHistory = [];
+        }
+
+        // Clear Chat
+        function clearChat() {
+            if (confirm('Hapus semua percakapan?')) {
+                newChat();
+            }
+        }
+
+        // Copy Code Functionality
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.copy-btn')) {
+                const code = e.target.closest('.code-block').querySelector('code').textContent;
+                navigator.clipboard.writeText(code).then(() => {
+                    const btn = e.target.closest('.copy-btn');
+                    const original = btn.textContent;
+                    btn.textContent = 'Copied!';
+                    setTimeout(() => btn.textContent = original, 2000);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

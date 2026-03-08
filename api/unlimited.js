@@ -1,7 +1,8 @@
-import axios from 'axios';
-import { handleCors } from './_utils/cors.js';
+const axios = require('axios');
+const { handleCors } = require('./_utils/cors.js');
+const crypto = require('crypto');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   handleCors(res);
   
   if (req.method === 'OPTIONS') return res.status(200).end();
@@ -44,10 +45,9 @@ export default async function handler(req, res) {
     const response = await axios.post(url, requestData, { 
       headers,
       timeout: 30000,
-      responseType: 'text' // Penting: ambil sebagai text, bukan json
+      responseType: 'text'
     });
     
-    // Parse NDJSON (newline delimited JSON)
     let responseText = '';
     const lines = response.data.toString().split('\n');
     
@@ -55,10 +55,8 @@ export default async function handler(req, res) {
       const trimmed = line.trim();
       if (!trimmed) continue;
       
-      // Cari line yang mengandung "diff"
       if (trimmed.includes('"diff"')) {
         try {
-          // Extract JSON dari line (format: 1:{"diff":[0,"text"]})
           const jsonMatch = trimmed.match(/\d+:(.+)/);
           if (jsonMatch) {
             const data = JSON.parse(jsonMatch[1]);
@@ -67,30 +65,23 @@ export default async function handler(req, res) {
             }
           }
         } catch (e) {
-          console.log('Parse line error:', e.message, 'Line:', trimmed.substring(0, 100));
           continue;
         }
       }
     }
     
     if (!responseText) {
-      // Fallback: coba cari pattern lain
-      console.log('Full response preview:', response.data.substring(0, 500));
       throw new Error('Tidak dapat mengekstrak respons dari AI');
     }
     
     res.status(200).json({ success: true, response: responseText });
     
   } catch (error) {
-    console.error('Unlimited AI Error:', error.message);
-    if (error.response) {
-      console.error('Status:', error.response.status);
-      console.error('Data preview:', error.response.data?.toString().substring(0, 500));
-    }
+    console.error('Error:', error.message);
     res.status(500).json({ 
       success: false, 
       error: error.message,
       details: error.response?.data?.toString().substring(0, 200)
     });
   }
-}
+};

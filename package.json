@@ -1,0 +1,11 @@
+{
+  "name": "pagaska-ai",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "Vex"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "uuid": "^9.0.0"
+  }
+}

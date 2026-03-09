@@ -4,21 +4,25 @@
   "buildCommand": null,
   "outputDirectory": "public",
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/$1" }
+    { "source": "/api/auth/login", "destination": "/api/auth/login.js" },
+    { "source": "/api/auth/me", "destination": "/api/auth/me.js" },
+    { "source": "/api/chat/save", "destination": "/api/chat/save.js" },
+    { "source": "/api/chat/history", "destination": "/api/chat/history.js" },
+    { "source": "/api/chat/delete", "destination": "/api/chat/delete.js" },
+    { "source": "/api/unlimited", "destination": "/api/unlimited.js" },
+    { "source": "/api/pixel", "destination": "/api/pixel.js" },
+    { "source": "/api/deepseek", "destination": "/api/deepseek.js" },
+    { "source": "/login", "destination": "/login.html" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [
     {
       "source": "/api/(.*)",
       "headers": [
         { "key": "Access-Control-Allow-Origin", "value": "*" },
-        { "key": "Access-Control-Allow-Methods", "value": "POST, OPTIONS" },
-        { "key": "Access-Control-Allow-Headers", "value": "Content-Type" }
+        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" }
       ]
     }
-  ],
-  "functions": {
-    "api/*.js": {
-      "maxDuration": 60
-    }
-  }
+  ]
 }

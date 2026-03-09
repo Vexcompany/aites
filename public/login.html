@@ -2,35 +2,32 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Login - Pagaska AI</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * { font-family: 'Inter', sans-serif; }
+        * { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         
-        .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        body {
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
         }
         
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.05);
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
-        .generasi-card {
-            transition: all 0.3s ease;
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
         
-        .generasi-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
-        }
-        
-        .generasi-card.active {
-            border-color: #667eea;
-            background: rgba(102, 126, 234, 0.15);
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
         
         .input-field {
@@ -44,163 +41,179 @@
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
         
-        .fade-in {
-            animation: fadeIn 0.5s ease-out;
+        .gen-card {
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .gen-card:hover, .gen-card.active {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
         }
         
-        .slide-up {
-            animation: slideUp 0.4s ease-out;
-        }
-        
+        .slide-up { animation: slideUp 0.4s ease-out; }
         @keyframes slideUp {
             from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        
+        .fade-in { animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 640px) {
+            .container-padding { padding: 1rem; }
+            .gen-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+        }
     </style>
 </head>
-<body class="bg-gray-900 min-h-screen flex items-center justify-center p-4">
-    <div class="w-full max-w-md">
-        <!-- Logo -->
-        <div class="text-center mb-8 fade-in">
-            <div class="w-20 h-20 gradient-bg rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-2xl">
-                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<body class="text-white flex items-center justify-center p-4">
+    <div class="w-full max-w-md mx-auto">
+        <!-- Logo Section -->
+        <div class="text-center mb-6 fade-in">
+            <div class="w-16 h-16 gradient-bg rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg shadow-purple-500/30">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.131A8 8 0 008 8m0 0a8 8 0 00-8 8c0 2.472.345 4.865.99 7.131M8 8a8 8 0 0016 0m0 0a8 8 0 00-8-8m0 0a8 8 0 00-8 8"/>
                 </svg>
             </div>
-            <h1 class="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                Pagaska AI
-            </h1>
-            <p class="text-gray-400 mt-2">Sistem Informasi Generasi Pagaska</p>
+            <h1 class="text-2xl font-bold gradient-text">Pagaska AI</h1>
+            <p class="text-gray-400 text-sm mt-1">Sistem Informasi Generasi</p>
         </div>
 
         <!-- Step 1: Pilih Generasi -->
-        <div id="step1" class="glass-effect rounded-2xl p-6 fade-in">
-            <h2 class="text-xl font-semibold mb-4 text-center">Pilih Generasi Anda</h2>
-            <div class="grid grid-cols-2 gap-3">
-                <button onclick="selectGenerasi(1)" class="generasi-card p-4 rounded-xl border border-gray-600 bg-gray-800/50 text-center hover:bg-gray-700/50">
+        <div id="step1" class="glass-card rounded-2xl p-5 fade-in">
+            <h2 class="text-lg font-semibold mb-4 text-center">Pilih Generasi Anda</h2>
+            
+            <div class="gen-grid grid grid-cols-2 gap-3">
+                <button onclick="selectGenerasi(1)" class="gen-card p-4 rounded-xl bg-gray-800/50 text-center">
                     <div class="text-2xl mb-1">🥇</div>
-                    <div class="font-semibold">Generasi 1</div>
-                    <div class="text-xs text-gray-400 mt-1">Pendiri</div>
+                    <div class="font-semibold text-sm">Generasi 1</div>
+                    <div class="text-xs text-gray-400">Pendiri</div>
                 </button>
-                <button onclick="selectGenerasi(2)" class="generasi-card p-4 rounded-xl border border-gray-600 bg-gray-800/50 text-center hover:bg-gray-700/50">
+                
+                <button onclick="selectGenerasi(2)" class="gen-card p-4 rounded-xl bg-gray-800/50 text-center">
                     <div class="text-2xl mb-1">🥈</div>
-                    <div class="font-semibold">Generasi 2</div>
-                    <div class="text-xs text-gray-400 mt-1">Penerus</div>
+                    <div class="font-semibold text-sm">Generasi 2</div>
+                    <div class="text-xs text-gray-400">Penerus</div>
                 </button>
-                <button onclick="selectGenerasi(3)" class="generasi-card p-4 rounded-xl border border-gray-600 bg-gray-800/50 text-center hover:bg-gray-700/50">
+                
+                <button onclick="selectGenerasi(3)" class="gen-card p-4 rounded-xl bg-gray-800/50 text-center">
                     <div class="text-2xl mb-1">🥉</div>
-                    <div class="font-semibold">Generasi 3</div>
-                    <div class="text-xs text-gray-400 mt-1">Pengembang</div>
+                    <div class="font-semibold text-sm">Generasi 3</div>
+                    <div class="text-xs text-gray-400">Pengembang</div>
                 </button>
-                <button onclick="selectGenerasi(4)" class="generasi-card p-4 rounded-xl border border-gray-600 bg-gray-800/50 text-center hover:bg-gray-700/50">
+                
+                <button onclick="selectGenerasi(4)" class="gen-card p-4 rounded-xl bg-gray-800/50 text-center">
                     <div class="text-2xl mb-1">⭐</div>
-                    <div class="font-semibold">Generasi 4</div>
-                    <div class="text-xs text-gray-400 mt-1">Anggota Baru</div>
+                    <div class="font-semibold text-sm">Generasi 4</div>
+                    <div class="text-xs text-gray-400">Anggota Baru</div>
                 </button>
+            </div>
+
+            <!-- Debug info -->
+            <div class="mt-4 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+                <p class="text-xs text-yellow-400 text-center">
+                    💡 Data Login Test:<br>
+                    Gen 1-3: Nama + Jabatan<br>
+                    Gen 4: Nama + "Anggota"
+                </p>
             </div>
         </div>
 
         <!-- Step 2: Form Login -->
-        <div id="step2" class="glass-effect rounded-2xl p-6 hidden slide-up">
-            <div class="flex items-center gap-3 mb-6">
+        <div id="step2" class="glass-card rounded-2xl p-5 hidden slide-up">
+            <div class="flex items-center gap-3 mb-5">
                 <button onclick="backToStep1()" class="p-2 hover:bg-gray-700 rounded-lg transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                     </svg>
                 </button>
                 <div>
-                    <h2 class="text-xl font-semibold">Login Generasi <span id="genNumber"></span></h2>
-                    <p class="text-sm text-gray-400" id="loginType"></p>
+                    <h2 class="text-lg font-semibold">Login Gen <span id="genNumber"></span></h2>
+                    <p class="text-xs text-gray-400" id="loginTypeText">Masukkan data Anda</p>
                 </div>
             </div>
 
             <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-2">Nama Lengkap</label>
+                    <label class="block text-sm font-medium text-gray-300 mb-1.5">Nama Lengkap</label>
                     <input 
                         type="text" 
                         id="nama" 
                         required
-                        class="input-field w-full px-4 py-3 rounded-xl text-white placeholder-gray-500 outline-none"
-                        placeholder="Masukkan nama lengkap"
+                        class="input-field w-full px-4 py-3 rounded-xl text-white placeholder-gray-500 outline-none text-sm"
+                        placeholder="Contoh: Ahmad Fauzi"
                     >
                 </div>
 
-                <div id="jabatanField">
-                    <label class="block text-sm font-medium text-gray-300 mb-2">Jabatan</label>
+                <div id="jabatanContainer">
+                    <label class="block text-sm font-medium text-gray-300 mb-1.5">Jabatan</label>
                     <input 
                         type="text" 
                         id="jabatan" 
                         required
-                        class="input-field w-full px-4 py-3 rounded-xl text-white placeholder-gray-500 outline-none"
-                        placeholder="Masukkan jabatan"
+                        class="input-field w-full px-4 py-3 rounded-xl text-white placeholder-gray-500 outline-none text-sm"
+                        placeholder="Contoh: Ketua Umum"
                     >
                 </div>
 
-                <div id="anggotaField" class="hidden">
-                    <div class="p-4 bg-blue-500/10 border border-blue-500/30 rounded-xl">
-                        <div class="flex items-center gap-2 text-blue-400 mb-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            <span class="font-medium">Akses Gratis</span>
-                        </div>
-                        <p class="text-sm text-gray-400">Generasi 4 menggunakan akses anggota. Ketik "Anggota" di field jabatan.</p>
-                    </div>
+                <div id="infoGen4" class="hidden p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                    <p class="text-xs text-blue-400">
+                        ℹ️ Generasi 4 otomatis menggunakan jabatan "Anggota"
+                    </p>
                 </div>
 
                 <button 
                     type="submit" 
                     id="loginBtn"
-                    class="w-full gradient-bg text-white font-semibold py-3 rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+                    class="w-full gradient-bg text-white font-semibold py-3 rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2 mt-6"
                 >
-                    <span>Masuk</span>
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <span id="btnText">Masuk</span>
+                    <svg id="btnIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
                     </svg>
+                    <div id="btnLoading" class="hidden w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                 </button>
             </form>
 
-            <div id="errorMsg" class="mt-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm hidden"></div>
-        </div>
-
-        <!-- Loading -->
-        <div id="loading" class="hidden text-center py-8">
-            <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p class="text-gray-400">Memverifikasi data...</p>
+            <div id="errorMsg" class="mt-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg hidden">
+                <p class="text-red-400 text-sm text-center" id="errorText"></p>
+            </div>
         </div>
     </div>
 
     <script>
         let selectedGenerasi = null;
+        const API_URL = ''; // Kosong untuk relative path
 
         function selectGenerasi(gen) {
             selectedGenerasi = gen;
             
-            // Update UI
             document.getElementById('step1').classList.add('hidden');
             document.getElementById('step2').classList.remove('hidden');
             document.getElementById('genNumber').textContent = gen;
             
             const isGen4 = gen === 4;
-            document.getElementById('loginType').textContent = isGen4 ? 'Akses Anggota Gratis' : 'Login Nama & Jabatan';
+            const jabatanInput = document.getElementById('jabatan');
+            const jabatanContainer = document.getElementById('jabatanContainer');
+            const infoGen4 = document.getElementById('infoGen4');
             
             if (isGen4) {
-                document.getElementById('jabatanField').classList.add('hidden');
-                document.getElementById('anggotaField').classList.remove('hidden');
-                document.getElementById('jabatan').value = 'Anggota';
+                jabatanContainer.classList.add('hidden');
+                jabatanInput.value = 'Anggota';
+                infoGen4.classList.remove('hidden');
+                document.getElementById('loginTypeText').textContent = 'Akses Anggota Gratis';
             } else {
-                document.getElementById('jabatanField').classList.remove('hidden');
-                document.getElementById('anggotaField').classList.add('hidden');
-                document.getElementById('jabatan').value = '';
+                jabatanContainer.classList.remove('hidden');
+                jabatanInput.value = '';
+                infoGen4.classList.add('hidden');
+                document.getElementById('loginTypeText').textContent = 'Login dengan Nama & Jabatan';
             }
             
-            // Focus nama
             setTimeout(() => document.getElementById('nama').focus(), 100);
         }
 
@@ -217,46 +230,65 @@
             const nama = document.getElementById('nama').value.trim();
             const jabatan = document.getElementById('jabatan').value.trim();
             
-            document.getElementById('loginBtn').disabled = true;
-            document.getElementById('loginBtn').innerHTML = `
-                <div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                <span>Memproses...</span>
-            `;
+            // UI Loading state
+            const btn = document.getElementById('loginBtn');
+            const btnText = document.getElementById('btnText');
+            const btnIcon = document.getElementById('btnIcon');
+            const btnLoading = document.getElementById('btnLoading');
+            
+            btn.disabled = true;
+            btnText.textContent = 'Memproses...';
+            btnIcon.classList.add('hidden');
+            btnLoading.classList.remove('hidden');
             document.getElementById('errorMsg').classList.add('hidden');
 
             try {
-                const res = await fetch('/api/auth/login', {
+                console.log('Sending login request:', { nama, jabatan, generasi: selectedGenerasi });
+                
+                const res = await fetch(`${API_URL}/api/auth/login`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
                     body: JSON.stringify({ nama, jabatan, generasi: selectedGenerasi })
                 });
                 
-                const data = await res.json();
+                console.log('Response status:', res.status);
+                
+                let data;
+                const contentType = res.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    data = await res.json();
+                } else {
+                    const text = await res.text();
+                    console.error('Non-JSON response:', text.substring(0, 200));
+                    throw new Error('Server returned non-JSON response. Check console.');
+                }
+                
+                console.log('Response data:', data);
                 
                 if (data.success) {
-                    // Simpan token
                     localStorage.setItem('pagaska_token', data.token);
                     localStorage.setItem('pagaska_user', JSON.stringify(data.user));
-                    
-                    // Redirect ke chat
                     window.location.href = '/';
                 } else {
                     throw new Error(data.error || 'Login gagal');
                 }
             } catch (err) {
-                document.getElementById('errorMsg').textContent = err.message;
+                console.error('Login error:', err);
+                document.getElementById('errorText').textContent = err.message;
                 document.getElementById('errorMsg').classList.remove('hidden');
-                document.getElementById('loginBtn').disabled = false;
-                document.getElementById('loginBtn').innerHTML = `
-                    <span>Masuk</span>
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
-                    </svg>
-                `;
+                
+                // Reset button
+                btn.disabled = false;
+                btnText.textContent = 'Masuk';
+                btnIcon.classList.remove('hidden');
+                btnLoading.classList.add('hidden');
             }
         }
 
-        // Cek jika sudah login
+        // Check if already logged in
         if (localStorage.getItem('pagaska_token')) {
             window.location.href = '/';
         }

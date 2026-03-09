@@ -74,7 +74,7 @@ const pagaskaGenerations = {
     { nama: "Silvia Nur Ramadhani", jabatan: "Disarda" },
     { nama: "Adly Surya Prasetiyo", jabatan: "Disarda" },
     { nama: "Meysa Desta Maharani", jabatan: "Disarda" },
-    { nama: "Richy Yuga Tri Finalaya", jabatan: "Koor Infokom" },
+    { nama: "Richy Yuga Tri Finalya", jabatan: "Koor Infokom", "My bini" },
     { nama: "Anisa Apriliana Tunggal Dewi", jabatan: "Infokom" },
     { nama: "Bhilqis Tian Zahrotushita", jabatan: "Infokom" },
     { nama: "Az Zahrah Khanza Dewi Kuwais", jabatan: "Infokom" },
@@ -183,3 +183,4 @@ module.exports = {
     return true;
   }
 };
+

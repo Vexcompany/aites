@@ -73,7 +73,7 @@ const pagaskaGenerations = {
     { nama: "Rolly Sadion Astyani", jabatan: "Disarda" },
     { nama: "Subhanifa Dwi Verbyanti", jabatan: "Disarda" },
     { nama: "Mariska Cahya Dwi Maulida", jabatan: "Disarda" },
-    { nama: "Jahra' Anasula Farianto", jabatan: "Disarda" },
+    { nama: "Jahra Anasula Farianto", jabatan: "Disarda" },
     { nama: "Ella Rahmadani Elliana", jabatan: "Disarda" },
     { nama: "Silvia Nur Ramadhani", jabatan: "Disarda" },
     { nama: "Adly Surya Prasetiyo", jabatan: "Disarda" },
@@ -173,5 +173,6 @@ module.exports = {
   }
 
 };
+
 
 

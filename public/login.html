@@ -224,69 +224,98 @@
             selectedGenerasi = null;
         }
 
-        async function handleLogin(e) {
-            e.preventDefault();
-            
-            const nama = document.getElementById('nama').value.trim();
-            const jabatan = document.getElementById('jabatan').value.trim();
-            
-            // UI Loading state
-            const btn = document.getElementById('loginBtn');
-            const btnText = document.getElementById('btnText');
-            const btnIcon = document.getElementById('btnIcon');
-            const btnLoading = document.getElementById('btnLoading');
-            
-            btn.disabled = true;
-            btnText.textContent = 'Memproses...';
-            btnIcon.classList.add('hidden');
-            btnLoading.classList.remove('hidden');
-            document.getElementById('errorMsg').classList.add('hidden');
+async function handleLogin(e) {
+    e.preventDefault();
+    
+    const nama = document.getElementById('nama').value.trim();
+    const jabatan = document.getElementById('jabatan').value.trim();
+    
+    // UI Loading state
+    const btn = document.getElementById('loginBtn');
+    const btnText = document.getElementById('btnText');
+    const btnIcon = document.getElementById('btnIcon');
+    const btnLoading = document.getElementById('btnLoading');
+    
+    btn.disabled = true;
+    btnText.textContent = 'Memproses...';
+    btnIcon.classList.add('hidden');
+    btnLoading.classList.remove('hidden');
+    document.getElementById('errorMsg').classList.add('hidden');
 
+    try {
+        console.log('Sending login request:', { nama, jabatan, generasi: selectedGenerasi });
+        
+        const res = await fetch(`${API_URL}/api/auth/login`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ nama, jabatan, generasi: selectedGenerasi })
+        });
+        
+        console.log('Response status:', res.status);
+        
+        let data;
+        const contentType = res.headers.get('content-type');
+        
+        if (!res.ok) {
+            // Jika status error, coba baca sebagai text dulu
+            const errorText = await res.text();
+            console.error('Error response:', errorText);
+            
+            // Coba parse sebagai JSON jika bisa
             try {
-                console.log('Sending login request:', { nama, jabatan, generasi: selectedGenerasi });
-                
-                const res = await fetch(`${API_URL}/api/auth/login`, {
-                    method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({ nama, jabatan, generasi: selectedGenerasi })
-                });
-                
-                console.log('Response status:', res.status);
-                
-                let data;
-                const contentType = res.headers.get('content-type');
-                if (contentType && contentType.includes('application/json')) {
-                    data = await res.json();
-                } else {
-                    const text = await res.text();
-                    console.error('Non-JSON response:', text.substring(0, 200));
-                    throw new Error('Server returned non-JSON response. Check console.');
-                }
-                
-                console.log('Response data:', data);
-                
-                if (data.success) {
-                    localStorage.setItem('pagaska_token', data.token);
-                    localStorage.setItem('pagaska_user', JSON.stringify(data.user));
-                    window.location.href = '/';
-                } else {
-                    throw new Error(data.error || 'Login gagal');
-                }
-            } catch (err) {
-                console.error('Login error:', err);
-                document.getElementById('errorText').textContent = err.message;
-                document.getElementById('errorMsg').classList.remove('hidden');
-                
-                // Reset button
-                btn.disabled = false;
-                btnText.textContent = 'Masuk';
-                btnIcon.classList.remove('hidden');
-                btnLoading.classList.add('hidden');
+                const errorJson = JSON.parse(errorText);
+                throw new Error(errorJson.error || errorJson.message || `Error ${res.status}: ${errorText}`);
+            } catch (parseErr) {
+                // Jika bukan JSON, tampilkan text langsung
+                throw new Error(`Server error ${res.status}: ${errorText.substring(0, 100)}`);
             }
         }
+        
+        if (contentType && contentType.includes('application/json')) {
+            data = await res.json();
+        } else {
+            const text = await res.text();
+            console.error('Non-JSON response:', text.substring(0, 200));
+            throw new Error('Server returned non-JSON response');
+        }
+        
+        console.log('Response data:', data);
+        
+        if (data.success) {
+            localStorage.setItem('pagaska_token', data.token);
+            localStorage.setItem('pagaska_user', JSON.stringify(data.user));
+            window.location.href = '/';
+        } else {
+            throw new Error(data.error || 'Login gagal');
+        }
+    } catch (err) {
+        console.error('Login error:', err);
+        
+        // PERBAIKAN: Pastikan error ditampilkan sebagai string
+        let errorMessage = 'Terjadi kesalahan';
+        
+        if (typeof err === 'string') {
+            errorMessage = err;
+        } else if (err instanceof Error) {
+            errorMessage = err.message;
+        } else if (typeof err === 'object') {
+            // Jika object, coba ekstrak message atau error
+            errorMessage = err.message || err.error || JSON.stringify(err);
+        }
+        
+        document.getElementById('errorText').textContent = errorMessage;
+        document.getElementById('errorMsg').classList.remove('hidden');
+        
+        // Reset button
+        btn.disabled = false;
+        btnText.textContent = 'Masuk';
+        btnIcon.classList.remove('hidden');
+        btnLoading.classList.add('hidden');
+    }
+}
 
         // Check if already logged in
         if (localStorage.getItem('pagaska_token')) {
@@ -295,3 +324,4 @@
     </script>
 </body>
 </html>
+

@@ -1,38 +1,34 @@
-// Simulasi database - untuk production gunakan Upstash Redis atau MongoDB
-const users = new Map();
-const chats = new Map();
-
 // Data Generasi Pagaska (Pre-populated)
 const pagaskaGenerations = {
   1: [
     { nama: "Ryan Yazid Hidayat", jabatan: "Ketua Umum" },
     { nama: "Sekar Rutikasari", jabatan: "Wakil Ketua Umum" },
-    { nama: "Hudaifa Ulil Albab", jabatan: "Sekretaris" },
-    { nama: "Febyola Putri Yulianti", jabatan: "Bendahara" },
+    { nama: "Hudaifa Uli Aibab", jabatan: "Sekretaris" },
+    { nama: "Rebyola Putri Yulianti", jabatan: "Bendahara" },
     { nama: "Rehan Raiszaki Muhfroni", jabatan: "Koor GK3" },
     { nama: "Yasir Isa", jabatan: "GK3" },
     { nama: "William Cristian Josepa", jabatan: "GK3" },
     { nama: "Dina Tri Handayani", jabatan: "GK3" },
     { nama: "Marsela Evi Novitasari", jabatan: "GK3" },
-    { nama: "Naina Wulansari", jabatan: "Koor Disarda" },
+    { nama: "Maina Wulansari", jabatan: "Koor Disarda" },
     { nama: "Renata Putri Aurellia", jabatan: "Disarda" },
     { nama: "Dwi Yuliana Saputri", jabatan: "Disarda" },
     { nama: "Denis Putri Yuliana", jabatan: "Disarda" },
     { nama: "Ilham Bekti Pratama", jabatan: "Disarda" },
     { nama: "Nataly Reva Ayu Pradifa", jabatan: "Disarda" },
-    { nama: "Amanda Amelia M", jabatan: "Disarda" },
-    { nama: "Asiva Rizky Agustin", jabatan: "Disarda" },
+    { nama: "Amanda Amelia W", jabatan: "Disarda" },
+    { nama: "Asiva Rizky Ayustin", jabatan: "Disarda" },
     { nama: "Rizky Aditya", jabatan: "Koor Infokom" },
     { nama: "Nisrina Kirana Alya", jabatan: "Infokom" },
     { nama: "Amanda Fidda Reza Azzahara", jabatan: "Infokom" },
-    { nama: "Salma Murni Indiannisa", jabatan: "Infokom" },
-    { nama: "Zitkanisa Ullima", jabatan: "Infokom" }
+    { nama: "Salma Murni Indianissa", jabatan: "Infokom" },
+    { nama: "Zitkanisa Ulina", jabatan: "Infokom" }
   ],
   2: [
     { nama: "Rizky Indra Permana", jabatan: "Ketua Umum" },
     { nama: "Dwi Bella Noviyanti", jabatan: "Wakil Ketua Umum" },
     { nama: "Anastasya Putri Gianto", jabatan: "Sekretaris" },
-    { nama: "Khofifah Tabina Azka Listaningtyas", jabatan: "Bendahara" },
+    { nama: "Khofifah Tabina Azka Listianingtyas", jabatan: "Bendahara" },
     { nama: "Satria Nur Hidayatullah", jabatan: "DTP" },
     { nama: "Reyna Natasya Wahyu Safitri", jabatan: "DTP" },
     { nama: "Ramzy Cahya Fauzan", jabatan: "Koor GK3" },
@@ -40,7 +36,7 @@ const pagaskaGenerations = {
     { nama: "Farhan Rizky Devannanda", jabatan: "GK3" },
     { nama: "Keisya Nabila", jabatan: "GK3" },
     { nama: "Tata Regita Juliana Putri", jabatan: "Koor Disarda" },
-    { nama: "Amanda Regina Putri Yuditira", jabatan: "Disarda" },
+    { nama: "Amanda Regina Putri Yudithira", jabatan: "Disarda" },
     { nama: "Ailen Listiani", jabatan: "Disarda" },
     { nama: "Lael Rahmadhani", jabatan: "Disarda" },
     { nama: "Dea Alif Purwandini", jabatan: "Disarda" },
@@ -57,28 +53,28 @@ const pagaskaGenerations = {
   3: [
     { nama: "Muhammad Afrizal Nurjananta", jabatan: "Ketua Umum" },
     { nama: "Fatimah Az-Zahra", jabatan: "Wakil Ketua Umum" },
-    { nama: "Nazuwa Qurroti Aqyuni Hasna", jabatan: "Sekretaris" },
+    { nama: "Nazwa Qurroti Aqyuni Hasna", jabatan: "Sekretaris" },
     { nama: "Asyifa Najwa Nabilla Putri", jabatan: "Sekretaris" },
     { nama: "Eva Devi Setyorini", jabatan: "Bendahara" },
-    { nama: "Winni Lestari Arti Ningsih", jabatan: "Bendahara" },
+    { nama: "Minni Lestari Arti Ningsih", jabatan: "Bendahara" },
     { nama: "Yoga Prasetyo Wibowo", jabatan: "DTP" },
     { nama: "Lelly Anggraini", jabatan: "DTP" },
     { nama: "Fahri Lintang Saputra", jabatan: "Koor GK3" },
     { nama: "Clarinta Jida Valery", jabatan: "GK3" },
     { nama: "Nur Azizah Lailatul Munawaroh", jabatan: "GK3" },
-    { nama: "Violita Ayu Wardani", jabatan: "GK3" },
+    { nama: "Violetta Ayu Wardani", jabatan: "GK3" },
     { nama: "Aymel Oktavia Fitroh Masyaroh", jabatan: "GK3" },
     { nama: "Suci Rofiqoh", jabatan: "Koor Disarda" },
     { nama: "Nabila Kayyisa Putri", jabatan: "Disarda" },
-    { nama: "Rolly Sadion Astyani", jabatan: "Disarda" },
-    { nama: "Subhanifa Dwi Verbyanti", jabatan: "Disarda" },
+    { nama: "Rolly Sadion Aryani", jabatan: "Disarda" },
+    { nama: "Subhanifa Dwi Yerbatyani", jabatan: "Disarda" },
     { nama: "Mariska Cahya Dwi Maulida", jabatan: "Disarda" },
     { nama: "Jahra Anasula Farianto", jabatan: "Disarda" },
     { nama: "Ella Rahmadani Elliana", jabatan: "Disarda" },
     { nama: "Silvia Nur Ramadhani", jabatan: "Disarda" },
     { nama: "Adly Surya Prasetiyo", jabatan: "Disarda" },
     { nama: "Meysa Desta Maharani", jabatan: "Disarda" },
-    { nama: "Richy Yuga Tri Finalya", jabatan: "Koor Infokom" },
+    { nama: "Richy Yuga Tri Finalaya", jabatan: "Koor Infokom" },
     { nama: "Anisa Apriliana Tunggal Dewi", jabatan: "Infokom" },
     { nama: "Bhilqis Tian Zahrotushita", jabatan: "Infokom" },
     { nama: "Az Zahrah Khanza Dewi Kuwais", jabatan: "Infokom" },
@@ -93,57 +89,72 @@ const pagaskaGenerations = {
   ]
 };
 
-// Pre-register users dari generasi 1-3 (login: Nama + Jabatan)
+// Inisialisasi database
+const users = new Map();
+const chats = new Map();
+
+// Register users dari generasi 1-3
 [1, 2, 3].forEach(gen => {
-  pagaskaGenerations[gen].forEach((user, idx) => {
-    const id = `gen${gen}_${idx}`;
+  if (pagaskaGenerations[gen]) {
+    pagaskaGenerations[gen].forEach((user, idx) => {
+      const id = `gen${gen}_${idx}`;
+      users.set(id, {
+        id,
+        nama: user.nama,
+        jabatan: user.jabatan,
+        generasi: gen,
+        tipe: 'jabatan',
+        createdAt: new Date().toISOString()
+      });
+    });
+  }
+});
+
+// Register generasi 4
+if (pagaskaGenerations[4]) {
+  pagaskaGenerations[4].forEach((user, idx) => {
+    const id = `gen4_${idx}`;
     users.set(id, {
       id,
       nama: user.nama,
       jabatan: user.jabatan,
-      generasi: gen,
-      tipe: 'jabatan',
+      generasi: 4,
+      tipe: 'gratis',
       createdAt: new Date().toISOString()
     });
   });
-});
+}
 
-// Pre-register generasi 4 (login: Anggota)
-pagaskaGenerations[4].forEach((user, idx) => {
-  const id = `gen4_${idx}`;
-  users.set(id, {
-    id,
-    nama: user.nama,
-    jabatan: user.jabatan,
-    generasi: 4,
-    tipe: 'gratis',
-    createdAt: new Date().toISOString()
-  });
-});
+console.log(`Loaded ${users.size} users from database`);
 
+// Export functions
 module.exports = {
   users,
   chats,
   
-  // Helper functions
   findUserByCredentials(nama, jabatan, generasi) {
+    console.log('Finding user:', { nama, jabatan, generasi });
+    
     for (const [id, user] of users) {
       if (user.generasi !== parseInt(generasi)) continue;
       
       if (user.generasi === 4) {
-        // Gen 4: cek jabatan = "Anggota"
+        // Gen 4: cek nama + jabatan "Anggota"
         if (user.jabatan.toLowerCase() === jabatan.toLowerCase() && 
             user.nama.toLowerCase() === nama.toLowerCase()) {
+          console.log('Found user (Gen 4):', user);
           return user;
         }
       } else {
         // Gen 1-3: cek nama + jabatan
         if (user.nama.toLowerCase() === nama.toLowerCase() && 
             user.jabatan.toLowerCase() === jabatan.toLowerCase()) {
+          console.log('Found user (Gen 1-3):', user);
           return user;
         }
       }
     }
+    console.log('User not found');
     return null;
   },
 
@@ -171,10 +182,4 @@ module.exports = {
     chats.set(userId, filtered);
     return true;
   }
-
 };
-
-
-
-
-

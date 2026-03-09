@@ -26,7 +26,7 @@ const pagaskaGenerations = {
     { nama: "Nisrina Kirana Alya", jabatan: "Infokom" },
     { nama: "Amanda Fidda Reza Azzahara", jabatan: "Infokom" },
     { nama: "Salma Murni Indiannisa", jabatan: "Infokom" },
-    { nama: "Zitkanisa Ullima", jabatan: "Infokom" },
+    { nama: "Zitkanisa Ullima", jabatan: "Infokom" }
   ],
   2: [
     { nama: "Rizky Indra Permana", jabatan: "Ketua Umum" },
@@ -52,7 +52,7 @@ const pagaskaGenerations = {
     { nama: "Giovanni Adhi Pratama", jabatan: "Koor Infokom" },
     { nama: "Desy Ariana Putri", jabatan: "Infokom" },
     { nama: "Yusilla Anggun Vauli", jabatan: "Infokom" },
-    { nama: "Alisya Desvita Putri", jabatan: "Infokom" },
+    { nama: "Alisya Desvita Putri", jabatan: "Infokom" }
   ],
   3: [
     { nama: "Muhammad Afrizal Nurjananta", jabatan: "Ketua Umum" },
@@ -84,7 +84,7 @@ const pagaskaGenerations = {
     { nama: "Az Zahrah Khanza Dewi Kuwais", jabatan: "Infokom" },
     { nama: "Nindia Artita Lestari", jabatan: "Infokom" },
     { nama: "Fahrel Akbar", jabatan: "Infokom" },
-    { nama: "Janathan Hafiz Nugroho", jabatan: "Infokom" },
+    { nama: "Janathan Hafiz Nugroho", jabatan: "Infokom" }
   ],
   4: [
     { nama: "Putri", jabatan: "Anggota", tipe: "gratis" },
@@ -173,6 +173,7 @@ module.exports = {
   }
 
 };
+
 
 
 

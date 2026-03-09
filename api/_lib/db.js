@@ -30,7 +30,7 @@ const pagaskaGenerations = {
   ],
   2: [
     { nama: "Rizky Indra Permana", jabatan: "Ketua Umum" },
-    { nama: "Dwi Bella Noviyanti", jabatan: "Wakil Ketua" },
+    { nama: "Dwi Bella Noviyanti", jabatan: "Wakil Ketua Umum" },
     { nama: "Anastasya Putri Gianto", jabatan: "Sekretaris" },
     { nama: "Khofifah Tabina Azka Listaningtyas", jabatan: "Bendahara" },
     { nama: "Satria Nur Hidayatullah", jabatan: "DTP" },
@@ -63,7 +63,7 @@ const pagaskaGenerations = {
     { nama: "Winni Lestari Arti Ningsih", jabatan: "Bendahara" },
     { nama: "Yoga Prasetyo Wibowo", jabatan: "DTP" },
     { nama: "Lelly Anggraini", jabatan: "DTP" },
-    { nama: "Fahri Lintang Saputra, jabatan: "Koor GK3" },
+    { nama: "Fahri Lintang Saputra", jabatan: "Koor GK3" },
     { nama: "Clarinta Jida Valery", jabatan: "GK3" },
     { nama: "Nur Azizah Lailatul Munawaroh", jabatan: "GK3" },
     { nama: "Violita Ayu Wardani", jabatan: "GK3" },
@@ -78,7 +78,7 @@ const pagaskaGenerations = {
     { nama: "Silvia Nur Ramadhani", jabatan: "Disarda" },
     { nama: "Adly Surya Prasetiyo", jabatan: "Disarda" },
     { nama: "Meysa Desta Maharani", jabatan: "Disarda" },
-    { nama: "Richy Yuga Tri Finalya", jabatan: "Koor Infokom" },
+    { nama: "Richy Yuga Tri Finalya", jabatan: "Koor Infokom", "My bini" },
     { nama: "Anisa Apriliana Tunggal Dewi", jabatan: "Infokom" },
     { nama: "Bhilqis Tian Zahrotushita", jabatan: "Infokom" },
     { nama: "Az Zahrah Khanza Dewi Kuwais", jabatan: "Infokom" },
@@ -173,4 +173,5 @@ module.exports = {
   }
 
 };
+
 

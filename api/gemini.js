@@ -35,38 +35,80 @@ module.exports = async function handler(req, res) {
       ]
     };
 
-    const response = await fetch(GEMINI_API_URL, {
-      method: 'POST',
-      headers: {
-        "Content-Type": "application/json",
-        "User-Agent": "PagaskaAI/1.0",
-        "Accept": "application/json"
-      },
-      body: JSON.stringify(payload)
-    });
+    console.log('Gemini request:', { model: selectedModel, message: message.substring(0, 50) });
 
-    if (!response.ok) {
-      throw new Error(`Gemini API error: ${response.status}`);
+    // Gunakan native fetch dengan timeout
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 25000); // 25 detik timeout
+
+    try {
+      const response = await fetch(GEMINI_API_URL, {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+          "User-Agent": "PagaskaAI/1.0",
+          "Accept": "application/json, text/plain, */*"
+        },
+        body: JSON.stringify(payload),
+        signal: controller.signal
+      });
+
+      clearTimeout(timeout);
+
+      console.log('Gemini response status:', response.status);
+
+      if (!response.ok) {
+        throw new Error(`API returned ${response.status}`);
+      }
+
+      // Baca sebagai text dulu (bukan langsung json)
+      const responseText = await response.text();
+      console.log('Raw response length:', responseText.length);
+      console.log('Raw response preview:', responseText.substring(0, 200));
+
+      if (!responseText || responseText.trim() === '') {
+        throw new Error('Empty response from API');
+      }
+
+      // Coba parse sebagai JSON, kalau gagal gunakan sebagai plain text
+      let aiReply;
+      try {
+        const jsonData = JSON.parse(responseText);
+        // Kalau JSON, ekstrak content
+        aiReply = jsonData.content || jsonData.message || jsonData.response || jsonData.text || JSON.stringify(jsonData);
+      } catch (e) {
+        // Bukan JSON, gunakan sebagai plain text
+        aiReply = responseText;
+      }
+
+      // Bersihkan response
+      aiReply = aiReply.trim();
+
+      if (!aiReply) {
+        throw new Error('No valid response content');
+      }
+
+      res.status(200).json({
+        success: true,
+        response: aiReply,
+        model: selectedModel,
+        engine: 'Gemini'
+      });
+
+    } catch (fetchError) {
+      clearTimeout(timeout);
+      if (fetchError.name === 'AbortError') {
+        throw new Error('Request timeout - API took too long to respond');
+      }
+      throw fetchError;
     }
-
-    const aiReply = await response.text();
-    
-    if (!aiReply) {
-      throw new Error('No response from Gemini API');
-    }
-
-    res.status(200).json({
-      success: true,
-      response: aiReply,
-      model: selectedModel,
-      engine: 'Gemini'
-    });
     
   } catch (error) {
     console.error('Gemini Error:', error);
     res.status(500).json({ 
       success: false, 
-      error: error.message || 'Failed to get response from Gemini'
+      error: error.message || 'Failed to get response from Gemini',
+      details: error.stack
     });
   }
 };

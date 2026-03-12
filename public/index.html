@@ -12,6 +12,8 @@
         body { background: #000; color: white; }
         
         .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .gradient-bg-orange { background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); }
+        .gradient-bg-green { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
         
         .app-container { height: 100vh; height: 100dvh; display: flex; flex-direction: column; }
         
@@ -25,7 +27,7 @@
             z-index: 50;
             transform: translateY(100%);
             transition: transform 0.3s ease;
-            max-height: 70vh;
+            max-height: 80vh;
             border-radius: 20px 20px 0 0;
         }
         
@@ -34,7 +36,7 @@
         @media (min-width: 768px) {
             .sidebar {
                 position: relative;
-                width: 300px;
+                width: 320px;
                 height: 100%;
                 border-radius: 0;
                 border-top: none;
@@ -141,20 +143,27 @@
         
         .animate-fade-in { animation: fadeInUp 0.4s ease-out; }
         
-        .model-pill {
-            padding: 6px 12px;
-            border-radius: 20px;
+        .model-card {
+            padding: 10px 14px;
+            border-radius: 12px;
             font-size: 12px;
             font-weight: 500;
             transition: all 0.2s;
             border: 1px solid transparent;
-            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         
-        .model-pill.active {
-            background: rgba(102, 126, 234, 0.2);
+        .model-card.active {
+            background: rgba(102, 126, 234, 0.15);
             border-color: #667eea;
-            color: #667eea;
+        }
+        
+        .model-icon {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
         }
         
         ::-webkit-scrollbar { width: 6px; }
@@ -163,6 +172,10 @@
         
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .spiritual-badge {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
     </style>
 </head>
 <body>
@@ -173,6 +186,7 @@
             <div class="p-4 h-full flex flex-col">
                 <div class="w-12 h-1 bg-gray-700 rounded-full mx-auto mb-4 md:hidden"></div>
                 
+                <!-- User Profile -->
                 <div class="flex items-center gap-3 mb-4 pb-4 border-b border-gray-800">
                     <div class="w-10 h-10 gradient-bg rounded-xl flex items-center justify-center flex-shrink-0">
                         <span id="userInitial" class="font-bold">P</span>
@@ -185,27 +199,71 @@
                     </div>
                 </div>
                 
+                <!-- Model Selection -->
                 <div class="mb-4">
-                    <h4 class="text-xs font-semibold text-gray-500 uppercase mb-2">Model AI</h4>
-                    <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                        <button onclick="setModel('unlimited')" id="pill-unlimited" class="model-pill active bg-gray-800 text-gray-300">
-                            Unlimited
+                    <h4 class="text-xs font-semibold text-gray-500 uppercase mb-2">Pilih Model AI</h4>
+                    
+                    <!-- Model Grid -->
+                    <div class="grid grid-cols-2 gap-2">
+                        <!-- Unlimited AI -->
+                        <button onclick="setModel('unlimited')" id="card-unlimited" class="model-card active bg-gray-800/50 text-gray-300">
+                            <div class="model-icon bg-green-400"></div>
+                            <div>
+                                <div class="font-medium">Unlimited</div>
+                                <div class="text-[10px] text-gray-500">Cepat</div>
+                            </div>
                         </button>
-                        <button onclick="setModel('pixel')" id="pill-pixel" class="model-pill bg-gray-800 text-gray-300">
-                            Pixel
+                        
+                        <!-- Pixel Chat -->
+                        <button onclick="setModel('pixel')" id="card-pixel" class="model-card bg-gray-800/50 text-gray-300">
+                            <div class="model-icon bg-blue-400"></div>
+                            <div>
+                                <div class="font-medium">Pixel</div>
+                                <div class="text-[10px] text-gray-500">Karakter</div>
+                            </div>
                         </button>
-                        <button onclick="setModel('deepseek')" id="pill-deepseek" class="model-pill bg-gray-800 text-gray-300">
-                            DeepSeek
+                        
+                        <!-- DeepSeek -->
+                        <button onclick="setModel('deepseek')" id="card-deepseek" class="model-card bg-gray-800/50 text-gray-300">
+                            <div class="model-icon bg-purple-400"></div>
+                            <div>
+                                <div class="font-medium">DeepSeek</div>
+                                <div class="text-[10px] text-gray-500">Reasoning</div>
+                            </div>
                         </button>
-                        <button onclick="setModel('gemini')" id="pill-gemini" class="model-pill bg-gray-800 text-gray-300">
-                            Gemini
+                        
+                        <!-- Gemini -->
+                        <button onclick="setModel('gemini')" id="card-gemini" class="model-card bg-gray-800/50 text-gray-300">
+                            <div class="model-icon bg-cyan-400"></div>
+                            <div>
+                                <div class="font-medium">Gemini</div>
+                                <div class="text-[10px] text-gray-500">Google</div>
+                            </div>
+                        </button>
+                        
+                        <!-- GitaGPT -->
+                        <button onclick="setModel('gita')" id="card-gita" class="model-card bg-gray-800/50 text-gray-300">
+                            <div class="w-4 h-4 rounded-full spiritual-badge flex items-center justify-center text-[8px]">🕉️</div>
+                            <div>
+                                <div class="font-medium">GitaGPT</div>
+                                <div class="text-[10px] text-gray-500">Spiritual</div>
+                            </div>
+                        </button>
+                        
+                        <!-- GPT-4 -->
+                        <button onclick="setModel('gpt4')" id="card-gpt4" class="model-card bg-gray-800/50 text-gray-300">
+                            <div class="model-icon bg-red-400"></div>
+                            <div>
+                                <div class="font-medium">GPT-4</div>
+                                <div class="text-[10px] text-gray-500">OpenAI</div>
+                            </div>
                         </button>
                     </div>
                     
-                    <!-- Mode selectors -->
+                    <!-- Mode Selectors -->
                     <select id="deepseekMode" class="hidden w-full mt-2 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-xs">
-                        <option value="flash">⚡ Flash</option>
-                        <option value="think">🧠 Think</option>
+                        <option value="flash">⚡ Flash Mode</option>
+                        <option value="think">🧠 Think Mode</option>
                     </select>
                     
                     <select id="geminiMode" class="hidden w-full mt-2 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-xs">
@@ -215,13 +273,15 @@
                     </select>
                 </div>
                 
+                <!-- Chat History -->
                 <div class="flex-1 overflow-y-auto">
-                    <h4 class="text-xs font-semibold text-gray-500 uppercase mb-2">Riwayat</h4>
+                    <h4 class="text-xs font-semibold text-gray-500 uppercase mb-2">Riwayat Chat</h4>
                     <div id="chatHistory" class="space-y-1">
                         <div class="text-center py-4 text-gray-500 text-xs">Belum ada riwayat</div>
                     </div>
                 </div>
                 
+                <!-- Actions -->
                 <div class="pt-4 border-t border-gray-800 space-y-2">
                     <button onclick="newChat()" class="w-full py-2.5 gradient-bg rounded-xl text-sm font-medium flex items-center justify-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -236,6 +296,7 @@
             </div>
         </aside>
 
+        <!-- Main Chat -->
         <main class="chat-area">
             <header class="h-14 border-b border-gray-800 flex items-center justify-between px-4 bg-black/50 backdrop-blur-sm sticky top-0 z-20">
                 <div class="flex items-center gap-3">
@@ -264,7 +325,7 @@
                         </svg>
                     </div>
                     <h2 class="text-lg font-bold mb-1">Halo, <span id="welcomeName">-</span>!</h2>
-                    <p class="text-gray-400 text-xs">Pilih model dan mulai chat</p>
+                    <p class="text-gray-400 text-xs">Pilih model AI dan mulai chat</p>
                 </div>
             </div>
 
@@ -317,12 +378,14 @@
         let currentUser = null;
         let conversationId = null;
 
-        // Model configurations
+        // Model configurations - 6 MODELS
         const modelConfigs = {
-            unlimited: { name: 'Unlimited AI', status: 'Online' },
-            pixel: { name: 'Pixel Chat', status: 'Character AI' },
-            deepseek: { name: 'DeepSeek', status: 'Deep Reasoning' },
-            gemini: { name: 'Gemini', status: 'Google AI' }
+            unlimited: { name: 'Unlimited AI', status: 'Cepat & Ringan', color: 'green' },
+            pixel: { name: 'Pixel Chat', status: 'Character AI', color: 'blue' },
+            deepseek: { name: 'DeepSeek', status: 'Deep Reasoning', color: 'purple' },
+            gemini: { name: 'Gemini', status: 'Google AI', color: 'cyan' },
+            gita: { name: 'GitaGPT', status: 'Spiritual Guide', color: 'orange' },
+            gpt4: { name: 'GPT-4', status: 'OpenAI Power', color: 'red' }
         };
 
         // INIT
@@ -361,9 +424,9 @@
         function setModel(model) {
             currentModel = model;
             
-            // Update active pill
-            document.querySelectorAll('.model-pill').forEach(p => p.classList.remove('active'));
-            document.getElementById(`pill-${model}`).classList.add('active');
+            // Update active card
+            document.querySelectorAll('.model-card').forEach(p => p.classList.remove('active'));
+            document.getElementById(`card-${model}`).classList.add('active');
             
             // Update header
             const config = modelConfigs[model];
@@ -403,7 +466,7 @@
             if (isThinking) {
                 div.innerHTML = `
                     <div class="max-w-[85%] md:max-w-[70%] p-3 rounded-xl bg-blue-900/30 border-l-4 border-blue-500 text-xs text-blue-200 font-mono">
-                        <div class="font-semibold mb-1 text-blue-400">🧠 Thinking</div>
+                        <div class="font-semibold mb-1 text-blue-400">🧠 Thinking Process</div>
                         ${escapeHtml(text)}
                     </div>
                 `;
@@ -451,7 +514,7 @@
             container.scrollTop = container.scrollHeight;
         }
 
-        // MAIN SEND FUNCTION
+        // MAIN SEND FUNCTION - SUPPORTS 6 MODELS
         async function send() {
             const input = document.getElementById('input');
             const text = input.value.trim();
@@ -470,13 +533,18 @@
                 const body = { message: text };
                 
                 // Model-specific parameters
-                if (currentModel === 'pixel') {
-                    body.characterId = "6472508d-5763-415d-8d8e-db48c7fbd05a";
-                    body.conversationId = conversationId;
-                } else if (currentModel === 'deepseek') {
-                    body.mode = document.getElementById('deepseekMode').value;
-                } else if (currentModel === 'gemini') {
-                    body.model = document.getElementById('geminiMode').value;
+                switch(currentModel) {
+                    case 'pixel':
+                        body.characterId = "6472508d-5763-415d-8d8e-db48c7fbd05a";
+                        body.conversationId = conversationId;
+                        break;
+                    case 'deepseek':
+                        body.mode = document.getElementById('deepseekMode').value;
+                        break;
+                    case 'gemini':
+                        body.model = document.getElementById('geminiMode').value;
+                        break;
+                    // gita dan gpt4 tidak perlu parameter tambahan
                 }
 
                 const res = await fetch(`/api/${currentModel}`, {
@@ -488,27 +556,44 @@
                     body: JSON.stringify(body)
                 });
 
-                const data = await res.json();
+                let data;
+                const contentType = res.headers.get('content-type');
+                
+                if (contentType && contentType.includes('application/json')) {
+                    data = await res.json();
+                } else {
+                    const text = await res.text();
+                    throw new Error(`Invalid response: ${text.substring(0, 100)}`);
+                }
+
                 document.getElementById('typing')?.remove();
 
-                if (!data.success) throw new Error(data.error);
+                if (!data.success) {
+                    throw new Error(data.error || 'Unknown error');
+                }
 
-                // Handle responses
-                if (currentModel === 'pixel') {
-                    conversationId = data.conversation_id;
-                    addMessage(data.message, false);
-                } else if (currentModel === 'deepseek' && data.think) {
-                    addMessage(data.think, false, true);
-                    addMessage(data.response, false);
-                } else {
-                    // Unlimited, Gemini, etc
-                    addMessage(data.response, false);
+                // Handle different response formats
+                switch(currentModel) {
+                    case 'pixel':
+                        conversationId = data.conversation_id;
+                        addMessage(data.message, false);
+                        break;
+                    case 'deepseek':
+                        if (data.think) addMessage(data.think, false, true);
+                        addMessage(data.response, false);
+                        break;
+                    case 'gita':
+                        addMessage(data.response, false);
+                        break;
+                    default:
+                        // unlimited, gemini, gpt4
+                        addMessage(data.response, false);
                 }
 
             } catch (err) {
                 document.getElementById('typing')?.remove();
+                console.error('Send error:', err);
                 addMessage('❌ Error: ' + err.message, false);
-                console.error(err);
             } finally {
                 isGenerating = false;
                 document.getElementById('sendBtn').disabled = false;
@@ -525,7 +610,7 @@
                         </svg>
                     </div>
                     <h2 class="text-lg font-bold mb-1">Chat Baru</h2>
-                    <p class="text-gray-400 text-xs">Mulai percakapan baru</p>
+                    <p class="text-gray-400 text-xs">Mulai percakapan baru dengan ${modelConfigs[currentModel].name}</p>
                 </div>
             `;
             messages = [];

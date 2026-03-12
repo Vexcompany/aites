@@ -1,5 +1,8 @@
 {
   "name": "pagaska-ai",
-  "version": "1.0.0",
-  "type": "commonjs"
+  "version": "2.0.0",
+  "type": "commonjs",
+  "dependencies": {
+    "axios": "^1.6.0"
+  }
 }

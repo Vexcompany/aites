@@ -208,10 +208,18 @@
                         <button onclick="setModel('deepseek')" id="pill-deepseek" class="model-pill bg-gray-800 text-gray-300">
                             DeepSeek
                         </button>
+                        <button onclick="setModel('gemini')" id="pill-gemini" class="model-pill bg-gray-800 text-gray-300">
+    Gemini
+                        </button>
                     </div>
                     <select id="deepseekMode" class="hidden w-full mt-2 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-xs">
                         <option value="flash">⚡ Flash</option>
                         <option value="think">🧠 Think</option>
+                    </select>
+                    <select id="geminiMode" class="hidden w-full mt-2 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-xs">
+    <option value="gemini-pro">⚡ Gemini Pro</option>
+    <option value="gemini-1.5">🧠 Gemini 1.5</option>
+    <option value="gemini-flash">🚀 Gemini Flash</option>
                     </select>
                 </div>
                 
@@ -362,11 +370,12 @@
             document.querySelectorAll('.model-pill').forEach(p => p.classList.remove('active'));
             document.getElementById(`pill-${model}`).classList.add('active');
             
-            const names = { unlimited: 'Unlimited AI', pixel: 'Pixel Chat', deepseek: 'DeepSeek' };
+            const names = { unlimited: 'Unlimited AI', pixel: 'Pixel Chat', deepseek: 'DeepSeek', gemini: 'Gemini' };
             document.getElementById('currentModel').textContent = names[model];
             
-            const dsMode = document.getElementById('deepseekMode');
-            dsMode.classList.toggle('hidden', model !== 'deepseek');
+            const dsMode = 
+            document.getElementById('deepseekMode').classList.toggle('hidden', model !== 'deepseek');
+            document.getElementById('geminiMode').classList.toggle('hidden', model !== 'gemini');
             
             if (window.innerWidth < 768) toggleSidebar();
         }
@@ -547,3 +556,4 @@
     </script>
 </body>
 </html>
+

@@ -12,6 +12,7 @@
     { "source": "/api/unlimited", "destination": "/api/unlimited.js" },
     { "source": "/api/pixel", "destination": "/api/pixel.js" },
     { "source": "/api/deepseek", "destination": "/api/deepseek.js" },
+    { "source": "/api/gemini", "destination": "/api/gemini.js" },
     { "source": "/login", "destination": "/login.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],

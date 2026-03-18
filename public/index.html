@@ -225,33 +225,6 @@
                             </div>
                         </button>
                         
-                        <!-- Pixel Chat -->
-                        <button onclick="setModel('pixel')" id="card-pixel" class="model-card bg-gray-800/50 text-gray-300">
-                            <div class="model-icon bg-blue-400"></div>
-                            <div>
-                                <div class="font-medium">Pixel</div>
-                                <div class="text-[10px] text-gray-500">Karakter</div>
-                            </div>
-                        </button>
-                        
-                        <!-- DeepSeek -->
-                        <button onclick="setModel('deepseek')" id="card-deepseek" class="model-card bg-gray-800/50 text-gray-300">
-                            <div class="model-icon bg-purple-400"></div>
-                            <div>
-                                <div class="font-medium">DeepSeek</div>
-                                <div class="text-[10px] text-gray-500">Reasoning</div>
-                            </div>
-                        </button>
-                        
-                        <!-- Gemini -->
-                        <button onclick="setModel('gemini')" id="card-gemini" class="model-card bg-gray-800/50 text-gray-300">
-                            <div class="model-icon bg-cyan-400"></div>
-                            <div>
-                                <div class="font-medium">Gemini</div>
-                                <div class="text-[10px] text-gray-500">Google</div>
-                            </div>
-                        </button>
-                        
                         <!-- GitaGPT -->
                         <button onclick="setModel('gita')" id="card-gita" class="model-card bg-gray-800/50 text-gray-300">
                             <div class="w-4 h-4 rounded-full spiritual-badge flex items-center justify-center text-[8px]">🕉️</div>
@@ -270,19 +243,6 @@
                             </div>
                         </button>
                     </div>
-                    
-                    <!-- Mode Selectors -->
-                    <select id="deepseekMode" class="hidden w-full mt-2 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-xs">
-                        <option value="flash">⚡ Flash Mode</option>
-                        <option value="think">🧠 Think Mode</option>
-                    </select>
-                    
-                    <select id="geminiMode" class="hidden w-full mt-2 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-xs">
-                        <option value="gemini-pro">⚡ Gemini Pro</option>
-                        <option value="gemini-1.5">🧠 Gemini 1.5</option>
-                        <option value="gemini-flash">🚀 Gemini Flash</option>
-                    </select>
-                </div>
                 
                 <!-- Chat History -->
                 <div class="flex-1 overflow-y-auto">
@@ -317,7 +277,7 @@
                         </svg>
                     </button>
                     <div>
-                        <h1 class="font-semibold text-sm md:text-base" id="currentModel">Unlimited AI</h1>
+                        <h1 class="font-semibold text-sm md:text-base" id="currentModel">Pagaska AI</h1>
                         <p class="text-[10px] text-gray-400" id="modelStatus">Online</p>
                     </div>
                 </div>
@@ -335,7 +295,7 @@
                             <polygon points="13,2 15.5,9 23,9 17,14 19.5,21 13,17 6.5,21 9,14 3,9 10.5,9" fill="#C9A84C" stroke="#F0D080" stroke-width="0.5"/>
                         </svg>
                     </div>
-                    <h2 class="text-lg font-bold mb-1">Hormat, <span id="welcomeName">-</span>!</h2>
+                    <h2 class="text-lg font-bold mb-1">Haloo, <span id="welcomeName">-</span>!</h2>
                     <p class="text-gray-400 text-xs mb-4">AI Pagaska siap melayani. Ada yang ingin ditanyakan?</p>
                     <div class="flex flex-wrap justify-center gap-2 px-4">
                         <button onclick="quickAsk('Apa itu Pagaska Gala Taksaka?')" class="text-xs px-3 py-1.5 rounded-full border border-red-900 text-red-400 hover:bg-red-950 transition-colors">Apa itu Pagaska?</button>

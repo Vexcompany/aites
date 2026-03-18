@@ -205,8 +205,19 @@
                     
                     <!-- Model Grid -->
                     <div class="grid grid-cols-2 gap-2">
+                        <!-- Pagaska AI - Featured full width -->
+                        <button onclick="setModel('pagaska')" id="card-pagaska" class="model-card col-span-2 bg-red-950/60 text-red-100 border border-red-800/60">
+                            <div class="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0" style="background: radial-gradient(circle at 40% 35%, #B22222, #5a0000); border: 1px solid #C9A84C;">
+                                <svg viewBox="0 0 12 12" width="10" height="10"><polygon points="6,1 7.2,4.3 10.5,4.3 7.9,6.5 9,9.8 6,7.9 3,9.8 4.1,6.5 1.5,4.3 4.8,4.3" fill="#C9A84C"/></svg>
+                            </div>
+                            <div class="flex-1">
+                                <div class="font-semibold text-red-200">&#11088; Pagaska AI</div>
+                                <div class="text-[10px] text-red-400">Asisten resmi Gala Taksaka</div>
+                            </div>
+                        </button>
+
                         <!-- Unlimited AI -->
-                        <button onclick="setModel('unlimited')" id="card-unlimited" class="model-card active bg-gray-800/50 text-gray-300">
+                        <button onclick="setModel('unlimited')" id="card-unlimited" class="model-card bg-gray-800/50 text-gray-300">
                             <div class="model-icon bg-green-400"></div>
                             <div>
                                 <div class="font-medium">Unlimited</div>
@@ -319,13 +330,21 @@
 
             <div id="messages" class="messages-container space-y-4">
                 <div class="text-center py-8 animate-fade-in">
-                    <div class="w-16 h-16 gradient-bg rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg">
-                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                    <div class="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg" style="background: radial-gradient(circle at 40% 35%, #B22222, #5a0000); border: 2px solid #C9A84C;">
+                        <svg viewBox="0 0 26 26" width="28" height="28" fill="none">
+                            <polygon points="13,2 15.5,9 23,9 17,14 19.5,21 13,17 6.5,21 9,14 3,9 10.5,9" fill="#C9A84C" stroke="#F0D080" stroke-width="0.5"/>
                         </svg>
                     </div>
-                    <h2 class="text-lg font-bold mb-1">Halo, <span id="welcomeName">-</span>!</h2>
-                    <p class="text-gray-400 text-xs">Pilih model AI dan mulai chat</p>
+                    <h2 class="text-lg font-bold mb-1">Hormat, <span id="welcomeName">-</span>!</h2>
+                    <p class="text-gray-400 text-xs mb-4">AI Pagaska siap melayani. Ada yang ingin ditanyakan?</p>
+                    <div class="flex flex-wrap justify-center gap-2 px-4">
+                        <button onclick="quickAsk('Apa itu Pagaska Gala Taksaka?')" class="text-xs px-3 py-1.5 rounded-full border border-red-900 text-red-400 hover:bg-red-950 transition-colors">Apa itu Pagaska?</button>
+                        <button onclick="quickAsk('Bagaimana sejarah berdirinya Gala Taksaka?')" class="text-xs px-3 py-1.5 rounded-full border border-red-900 text-red-400 hover:bg-red-950 transition-colors">Sejarah</button>
+                        <button onclick="quickAsk('Apa makna nama Gala Taksaka?')" class="text-xs px-3 py-1.5 rounded-full border border-red-900 text-red-400 hover:bg-red-950 transition-colors">Makna nama</button>
+                        <button onclick="quickAsk('Apa visi dan misi Pagaska?')" class="text-xs px-3 py-1.5 rounded-full border border-red-900 text-red-400 hover:bg-red-950 transition-colors">Visi & Misi</button>
+                        <button onclick="quickAsk('Apa saja kegiatan rutin Pagaska?')" class="text-xs px-3 py-1.5 rounded-full border border-red-900 text-red-400 hover:bg-red-950 transition-colors">Kegiatan</button>
+                        <button onclick="quickAsk('Bagaimana cara mendaftar jadi anggota Pagaska?')" class="text-xs px-3 py-1.5 rounded-full border border-red-900 text-red-400 hover:bg-red-950 transition-colors">Cara daftar</button>
+                    </div>
                 </div>
             </div>
 
@@ -372,7 +391,7 @@
 
     <script>
         // STATE & CONFIG
-        let currentModel = 'unlimited';
+        let currentModel = 'pagaska';
         let isGenerating = false;
         let messages = [];
         let currentUser = null;
@@ -380,6 +399,7 @@
 
         // Model configurations - 6 MODELS
         const modelConfigs = {
+            pagaska: { name: '⭐ Pagaska AI', status: 'Asisten resmi Gala Taksaka', color: 'red' },
             unlimited: { name: 'Unlimited AI', status: 'Cepat & Ringan', color: 'green' },
             pixel: { name: 'Pixel Chat', status: 'Character AI', color: 'blue' },
             deepseek: { name: 'DeepSeek', status: 'Deep Reasoning', color: 'purple' },
@@ -544,7 +564,7 @@
                     case 'gemini':
                         body.model = document.getElementById('geminiMode').value;
                         break;
-                    // gita dan gpt4 tidak perlu parameter tambahan
+                    // gita, gpt4, pagaska tidak perlu parameter tambahan
                 }
 
                 const res = await fetch(`/api/${currentModel}`, {
@@ -601,6 +621,12 @@
         }
 
         // CHAT MANAGEMENT
+        function quickAsk(text) {
+            if (currentModel !== 'pagaska') setModel('pagaska');
+            document.getElementById('input').value = text;
+            send();
+        }
+
         function newChat() {
             document.getElementById('messages').innerHTML = `
                 <div class="text-center py-8 animate-fade-in">

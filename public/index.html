@@ -14,7 +14,6 @@
         .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
         .gradient-bg-orange { background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); }
         .gradient-bg-green { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
-        .gradient-bg-purple { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); }
         
         .app-container { height: 100vh; height: 100dvh; display: flex; flex-direction: column; }
         
@@ -177,10 +176,6 @@
         .spiritual-badge {
             background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
         }
-        
-        .zai-badge {
-            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
-        }
     </style>
 </head>
 <body>
@@ -221,15 +216,6 @@
                             </div>
                         </button>
 
-                        <!-- Z.ai GLM-5 - NEW -->
-                        <button onclick="setModel('zai')" id="card-zai" class="model-card bg-cyan-950/40 text-cyan-100 border border-cyan-800/40">
-                            <div class="w-4 h-4 rounded-full zai-badge flex items-center justify-center text-[8px] font-bold">Z</div>
-                            <div>
-                                <div class="font-medium">Z.ai GLM-5</div>
-                                <div class="text-[10px] text-cyan-400">Thinking Model</div>
-                            </div>
-                        </button>
-
                         <!-- Unlimited AI -->
                         <button onclick="setModel('unlimited')" id="card-unlimited" class="model-card bg-gray-800/50 text-gray-300">
                             <div class="model-icon bg-green-400"></div>
@@ -257,7 +243,6 @@
                             </div>
                         </button>
                     </div>
-                </div>
                 
                 <!-- Chat History -->
                 <div class="flex-1 overflow-y-auto">
@@ -364,22 +349,17 @@
         </nav>
     </div>
 
-    <script type="module">
-        // IMPORT ZAI SERVICE
-        import { ZAIService } from './zAI.js';
-        
+    <script>
         // STATE & CONFIG
         let currentModel = 'pagaska';
         let isGenerating = false;
         let messages = [];
         let currentUser = null;
         let conversationId = null;
-        let zaiService = null;
 
-        // Model configurations - 5 MODELS (added zai)
+        // Model configurations - 6 MODELS
         const modelConfigs = {
             pagaska: { name: '⭐ Pagaska AI', status: 'Asisten resmi Gala Taksaka', color: 'red' },
-            zai: { name: 'Z.ai GLM-5', status: 'Thinking AI Model', color: 'cyan' },
             unlimited: { name: 'Unlimited AI', status: 'Cepat & Ringan', color: 'green' },
             gita: { name: 'GitaGPT', status: 'Spiritual Guide', color: 'orange' },
             gpt4: { name: 'GPT-4', status: 'OpenAI Power', color: 'red' }
@@ -406,9 +386,6 @@
                 const colors = ['', 'bg-yellow-600', 'bg-gray-500', 'bg-orange-700', 'bg-blue-600'];
                 document.getElementById('userBadge').className = `text-[10px] px-2 py-0.5 rounded-full text-white ${colors[data.user.generasi] || 'bg-gray-600'}`;
                 
-                // Init ZAI Service
-                zaiService = new ZAIService();
-                
             } catch (err) {
                 localStorage.removeItem('pagaska_token');
                 window.location.href = '/login.html';
@@ -416,12 +393,12 @@
         });
 
         // UI FUNCTIONS
-        window.toggleSidebar = function() {
+        function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('open');
             document.getElementById('overlay').classList.toggle('show');
         }
 
-        window.setModel = function(model) {
+        function setModel(model) {
             currentModel = model;
             
             // Update active card
@@ -433,15 +410,19 @@
             document.getElementById('currentModel').textContent = config.name;
             document.getElementById('modelStatus').textContent = config.status;
             
+            // Show/hide mode selectors
+            document.getElementById('deepseekMode').classList.toggle('hidden', model !== 'deepseek');
+            document.getElementById('geminiMode').classList.toggle('hidden', model !== 'gemini');
+            
             if (window.innerWidth < 768) toggleSidebar();
         }
 
-        window.resize = function(el) {
+        function resize(el) {
             el.style.height = 'auto';
             el.style.height = Math.min(el.scrollHeight, 96) + 'px';
         }
 
-        window.handleKey = function(e) {
+        function handleKey(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 send();
@@ -461,8 +442,8 @@
             
             if (isThinking) {
                 div.innerHTML = `
-                    <div class="max-w-[85%] md:max-w-[70%] p-3 rounded-xl bg-cyan-900/30 border-l-4 border-cyan-500 text-xs text-cyan-200 font-mono">
-                        <div class="font-semibold mb-1 text-cyan-400">🧠 Thinking Process</div>
+                    <div class="max-w-[85%] md:max-w-[70%] p-3 rounded-xl bg-blue-900/30 border-l-4 border-blue-500 text-xs text-blue-200 font-mono">
+                        <div class="font-semibold mb-1 text-blue-400">🧠 Thinking Process</div>
                         ${escapeHtml(text)}
                     </div>
                 `;
@@ -510,8 +491,8 @@
             container.scrollTop = container.scrollHeight;
         }
 
-        // MAIN SEND FUNCTION - SUPPORTS 5 MODELS (added zai)
-        window.send = async function() {
+        // MAIN SEND FUNCTION - SUPPORTS 6 MODELS
+        async function send() {
             const input = document.getElementById('input');
             const text = input.value.trim();
             if (!text || isGenerating) return;
@@ -525,60 +506,65 @@
             document.getElementById('sendBtn').disabled = true;
 
             try {
-                // Handle Z.ai model separately (client-side)
-                if (currentModel === 'zai') {
-                    document.getElementById('typing')?.remove();
-                    
-                    const response = await zaiService.chat(text, {
-                        onThinking: (thinking) => {
-                            addMessage(thinking, false, true);
-                        }
-                    });
-                    
-                    if (response.thinking) {
-                        // Thinking sudah ditampilkan via callback
-                    }
-                    addMessage(response.answer, false);
-                    
+                const token = localStorage.getItem('pagaska_token');
+                const body = { message: text };
+                
+                // Model-specific parameters
+                switch(currentModel) {
+                    case 'pixel':
+                        body.characterId = "6472508d-5763-415d-8d8e-db48c7fbd05a";
+                        body.conversationId = conversationId;
+                        break;
+                    case 'deepseek':
+                        body.mode = document.getElementById('deepseekMode').value;
+                        break;
+                    case 'gemini':
+                        body.model = document.getElementById('geminiMode').value;
+                        break;
+                    // gita, gpt4, pagaska tidak perlu parameter tambahan
+                }
+
+                const res = await fetch(`/api/${currentModel}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                let data;
+                const contentType = res.headers.get('content-type');
+                
+                if (contentType && contentType.includes('application/json')) {
+                    data = await res.json();
                 } else {
-                    // Existing backend models
-                    const token = localStorage.getItem('pagaska_token');
-                    const body = { message: text };
+                    const text = await res.text();
+                    throw new Error(`Invalid response: ${text.substring(0, 100)}`);
+                }
 
-                    const res = await fetch(`/api/${currentModel}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${token}`
-                        },
-                        body: JSON.stringify(body)
-                    });
+                document.getElementById('typing')?.remove();
 
-                    let data;
-                    const contentType = res.headers.get('content-type');
-                    
-                    if (contentType && contentType.includes('application/json')) {
-                        data = await res.json();
-                    } else {
-                        const text = await res.text();
-                        throw new Error(`Invalid response: ${text.substring(0, 100)}`);
-                    }
+                if (!data.success) {
+                    throw new Error(data.error || 'Unknown error');
+                }
 
-                    document.getElementById('typing')?.remove();
-
-                    if (!data.success) {
-                        throw new Error(data.error || 'Unknown error');
-                    }
-
-                    // Handle different response formats
-                    switch(currentModel) {
-                        case 'gita':
-                            addMessage(data.response, false);
-                            break;
-                        default:
-                            // unlimited, gpt4, pagaska
-                            addMessage(data.response, false);
-                    }
+                // Handle different response formats
+                switch(currentModel) {
+                    case 'pixel':
+                        conversationId = data.conversation_id;
+                        addMessage(data.message, false);
+                        break;
+                    case 'deepseek':
+                        if (data.think) addMessage(data.think, false, true);
+                        addMessage(data.response, false);
+                        break;
+                    case 'gita':
+                        addMessage(data.response, false);
+                        break;
+                    default:
+                        // unlimited, gemini, gpt4
+                        addMessage(data.response, false);
                 }
 
             } catch (err) {
@@ -592,17 +578,13 @@
         }
 
         // CHAT MANAGEMENT
-        window.quickAsk = function(text) {
+        function quickAsk(text) {
             if (currentModel !== 'pagaska') setModel('pagaska');
             document.getElementById('input').value = text;
             send();
         }
 
-        window.newChat = function() {
-            // Reset Z.ai conversation
-            if (zaiService) zaiService.resetConversation();
-            conversationId = null;
-            
+        function newChat() {
             document.getElementById('messages').innerHTML = `
                 <div class="text-center py-8 animate-fade-in">
                     <div class="w-16 h-16 gradient-bg rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg">
@@ -615,10 +597,11 @@
                 </div>
             `;
             messages = [];
+            conversationId = null;
             if (window.innerWidth < 768) toggleSidebar();
         }
 
-        window.saveChat = async function() {
+        async function saveChat() {
             if (messages.length === 0) return alert('Tidak ada chat untuk disimpan');
             
             try {
@@ -639,7 +622,7 @@
             }
         }
 
-        window.logout = function() {
+        function logout() {
             localStorage.clear();
             window.location.href = '/login.html';
         }

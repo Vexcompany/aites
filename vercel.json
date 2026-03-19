@@ -14,6 +14,7 @@
     { "source": "/api/gita", "destination": "/api/gita.js" },
     { "source": "/api/gpt4", "destination": "/api/gpt4.js" },
     { "source": "/api/admin", "destination": "/api/admin.js" },
+    { "source": "/api/test-redis", "destination": "/api/test-redis.js" },
     { "source": "/admin", "destination": "/admin.html" },
     { "source": "/login", "destination": "/login.html" },
     { "source": "/(.*)", "destination": "/index.html" }

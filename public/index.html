@@ -461,6 +461,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     badge.style.background = badgeColors[data.user.generasi] || '#1c1c1c';
     badge.style.color = '#e5e7eb';
     badge.style.borderColor = 'transparent';
+    loadHistory();
   } catch {
     localStorage.removeItem('pagaska_token');
     window.location.href = '/login.html';
@@ -634,7 +635,7 @@ async function saveChat() {
     const res = await fetch('/api/chat/save', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ messages })
+      body: JSON.stringify({ messages, model: currentModel })
     });
     const data = await res.json();
     if (data.success) alert('Chat disimpan!');
@@ -652,6 +653,30 @@ async function autoSaveChat() {
       body: JSON.stringify({ messages, model: currentModel })
     });
   } catch {} // silent, tidak ganggu user
+}
+
+// ===== LOAD HISTORY =====
+async function loadHistory() {
+  try {
+    const token = localStorage.getItem('pagaska_token');
+    const res = await fetch('/api/chat/history', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const data = await res.json();
+    if (!data.success) return;
+
+    const container = document.getElementById('chatHistory');
+    if (!data.chats.length) {
+      container.innerHTML = '<div class="history-empty">Belum ada riwayat</div>';
+      return;
+    }
+    container.innerHTML = data.chats.map(c => `
+      <div class="history-item" title="${c.preview || ''}">
+        <span style="font-size:10px;color:var(--text3);margin-right:5px">${c.model || '?'}</span>
+        ${c.preview || '(kosong)'}
+      </div>
+    `).join('');
+  } catch {}
 }
 
 function logout() {

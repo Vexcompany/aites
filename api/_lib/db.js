@@ -119,7 +119,7 @@ const MEMBERS = {
   ]
 };
 
-const ADMIN_NAMES = ['Vanzz', 'Vex']; // ← EDIT INI
+const ADMIN_NAMES = ['Richy Yuga Tri Finalya', 'Giovanni Adhi Pratama']; // ← EDIT INI
 
 function makeUserId(nama, gen) {
   return `u:${gen}:${nama.toLowerCase().replace(/\s+/g,'_')}`;

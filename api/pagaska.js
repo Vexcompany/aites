@@ -13,7 +13,7 @@ const PAGASKA_DATA = {
   strukturOrganisasi: "Pembina: [Nama] | Ketua: [Nama] | Sekretaris: [Nama] | Bendahara: [Nama]",
   prestasi: "TULIS_PRESTASI_DI_SINI",
   kegiatanRutin: "Latihan rutin [hari] pukul [jam], Upacara bendera setiap Senin, LKBB",
-  kontak: "Instagram: @[handle] | Email: [email]"
+  kontak: "Instagram: @pagaska_ | Tiktok: @gala.taksaka1"
 };
 
 function buildSystemPrompt() {

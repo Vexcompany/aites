@@ -5,24 +5,17 @@ module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  
+
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const auth = req.headers.authorization;
-  if (!auth?.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
+  const token = req.headers.authorization?.slice(7);
+  const payload = token ? verify(token) : null;
+  if (!payload) return res.status(401).json({ error: 'Unauthorized' });
 
-  const token = auth.slice(7);
-  const payload = verify(token);
-  
-  if (!payload) {
-    return res.status(401).json({ error: 'Invalid token' });
-  }
+  const { messages, model } = req.body;
+  if (!messages?.length) return res.status(400).json({ error: 'Messages kosong' });
 
-  const { messages } = req.body;
-  const chat = saveChat(payload.userId, messages);
-  
+  const chat = await saveChat(payload.userId, messages, model || 'unknown');
   res.status(200).json({ success: true, chat });
 };

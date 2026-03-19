@@ -587,6 +587,7 @@ async function send() {
       appendMsg('ai', data.think, true);
     }
     appendMsg('ai', data.response || data.message || '—');
+    autoSaveChat();
 
   } catch (err) {
     removeTyping();
@@ -638,6 +639,19 @@ async function saveChat() {
     const data = await res.json();
     if (data.success) alert('Chat disimpan!');
   } catch (err) { alert('Gagal: ' + err.message); }
+}
+
+// ===== AUTO SAVE =====
+async function autoSaveChat() {
+  if (!messages.length) return;
+  try {
+    const token = localStorage.getItem('pagaska_token');
+    await fetch('/api/chat/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ messages, model: currentModel })
+    });
+  } catch {} // silent, tidak ganggu user
 }
 
 function logout() {

@@ -1,631 +1,653 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pagaska AI Chat</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        * { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        
-        body { background: #000; color: white; }
-        
-        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-        .gradient-bg-orange { background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); }
-        .gradient-bg-green { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
-        
-        .app-container { height: 100vh; height: 100dvh; display: flex; flex-direction: column; }
-        
-        .sidebar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: #0f0f0f;
-            border-top: 1px solid #1f1f1f;
-            z-index: 50;
-            transform: translateY(100%);
-            transition: transform 0.3s ease;
-            max-height: 80vh;
-            border-radius: 20px 20px 0 0;
-        }
-        
-        .sidebar.open { transform: translateY(0); }
-        
-        @media (min-width: 768px) {
-            .sidebar {
-                position: relative;
-                width: 320px;
-                height: 100%;
-                border-radius: 0;
-                border-top: none;
-                border-right: 1px solid #1f1f1f;
-                transform: none;
-                max-height: none;
-            }
-        }
-        
-        .chat-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            padding-bottom: 80px;
-        }
-        
-        @media (min-width: 768px) {
-            .chat-area { padding-bottom: 0; }
-        }
-        
-        .messages-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px;
-            scroll-behavior: smooth;
-        }
-        
-        @media (min-width: 768px) {
-            .messages-container { padding: 24px; }
-        }
-        
-        .bubble-user {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 18px 18px 4px 18px;
-            max-width: 85%;
-            margin-left: auto;
-        }
-        
-        .bubble-ai {
-            background: #1f1f1f;
-            border: 1px solid #2f2f2f;
-            border-radius: 18px 18px 18px 4px;
-            max-width: 85%;
-        }
-        
-        @media (min-width: 768px) {
-            .bubble-user, .bubble-ai { max-width: 70%; }
-        }
-        
-        .input-container {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: #0f0f0f;
-            border-top: 1px solid #1f1f1f;
-            padding: 12px 16px;
-            padding-bottom: calc(12px + env(safe-area-inset-bottom));
-            z-index: 40;
-        }
-        
-        @media (min-width: 768px) {
-            .input-container {
-                position: relative;
-                border-top: 1px solid #1f1f1f;
-                padding: 16px 24px;
-            }
-        }
-        
-        .mobile-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: #0f0f0f;
-            border-top: 1px solid #1f1f1f;
-            padding: 8px 16px calc(8px + env(safe-area-inset-bottom));
-            display: flex;
-            justify-content: space-around;
-            z-index: 30;
-        }
-        
-        @media (min-width: 768px) {
-            .mobile-nav { display: none; }
-        }
-        
-        .overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.8);
-            z-index: 45;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s;
-        }
-        
-        .overlay.show { opacity: 1; visibility: visible; }
-        
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .animate-fade-in { animation: fadeInUp 0.4s ease-out; }
-        
-        .model-card {
-            padding: 10px 14px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 500;
-            transition: all 0.2s;
-            border: 1px solid transparent;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .model-card.active {
-            background: rgba(102, 126, 234, 0.15);
-            border-color: #667eea;
-        }
-        
-        .model-icon {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-        }
-        
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
-        
-        .scrollbar-hide::-webkit-scrollbar { display: none; }
-        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        .spiritual-badge {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Pagaska AI Chat</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0a;
+  --bg1:#0f0f0f;
+  --bg2:#141414;
+  --bg3:#1c1c1c;
+  --bg4:#222;
+  --border:#1e1e1e;
+  --border2:#2a2a2a;
+  --border3:#333;
+  --text:#f0ece4;
+  --text2:#888;
+  --text3:#555;
+  --red:#9b1111;
+  --red2:#c0392b;
+  --gold:#c9a84c;
+  --gold2:#e8c96a;
+  --bubble-user-from:#9b1111;
+  --bubble-user-to:#7a0d0d;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;font-size:14px;line-height:1.5;-webkit-tap-highlight-color:transparent;overflow:hidden}
+
+/* ===== LAYOUT ===== */
+.app{display:flex;height:100dvh}
+
+/* ===== SIDEBAR ===== */
+.sidebar{
+  width:260px;flex-shrink:0;
+  background:var(--bg1);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  height:100%;overflow:hidden;
+  transition:transform 0.28s cubic-bezier(0.4,0,0.2,1);
+}
+.sidebar-inner{display:flex;flex-direction:column;height:100%;padding:16px;gap:16px;overflow-y:auto}
+.sidebar-inner::-webkit-scrollbar{width:3px}
+.sidebar-inner::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* User profile */
+.user-profile{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:11px;
+  background:var(--bg2);border:1px solid var(--border);
+}
+.user-avatar{
+  width:36px;height:36px;border-radius:10px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--red2),var(--red));
+  border:1px solid rgba(201,168,76,0.3);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:14px;color:#fff;
+}
+.user-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-badge{
+  display:inline-block;font-size:10px;padding:1px 7px;border-radius:20px;
+  background:var(--bg3);color:var(--text2);margin-top:2px;border:1px solid var(--border2);
+}
+
+/* Section labels */
+.section-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px}
+
+/* Model cards */
+.model-list{display:flex;flex-direction:column;gap:4px}
+.model-card{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:10px;
+  background:transparent;border:1px solid transparent;
+  color:var(--text2);cursor:pointer;text-align:left;
+  transition:all 0.15s;width:100%;
+}
+.model-card:hover{background:var(--bg2);border-color:var(--border);color:var(--text)}
+.model-card.active{background:var(--bg2);border-color:var(--border2);color:var(--text)}
+.model-card.active-pagaska{
+  background:rgba(139,26,26,0.12);
+  border-color:rgba(201,168,76,0.25);
+  color:var(--text);
+}
+.model-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.model-card-text{flex:1;min-width:0}
+.model-card-name{font-size:13px;font-weight:500}
+.model-card-sub{font-size:11px;color:var(--text3);margin-top:0px}
+.model-card.active .model-card-sub,
+.model-card.active-pagaska .model-card-sub{color:var(--text2)}
+.pagaska-icon{
+  width:22px;height:22px;border-radius:6px;flex-shrink:0;
+  background:linear-gradient(145deg,#1e0505,#3d0a0a);
+  border:1px solid rgba(201,168,76,0.4);
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* Chat history */
+.history-list{display:flex;flex-direction:column;gap:3px;flex:1}
+.history-item{
+  padding:8px 10px;border-radius:8px;font-size:12px;
+  color:var(--text2);cursor:pointer;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  transition:all 0.12s;border:1px solid transparent;
+}
+.history-item:hover{background:var(--bg2);color:var(--text);border-color:var(--border)}
+.history-empty{font-size:12px;color:var(--text3);text-align:center;padding:12px 0}
+
+/* Actions */
+.sidebar-actions{display:flex;flex-direction:column;gap:6px;margin-top:auto}
+.btn-new{
+  padding:10px;border-radius:10px;
+  background:linear-gradient(135deg,var(--red2),var(--red));
+  border:1px solid rgba(201,168,76,0.2);
+  color:#fff;font-size:13px;font-weight:500;font-family:inherit;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;
+  transition:opacity 0.15s;
+}
+.btn-new:hover{opacity:0.88}
+.btn-logout{
+  padding:10px;border-radius:10px;
+  background:transparent;border:1px solid var(--border2);
+  color:var(--text2);font-size:13px;font-family:inherit;
+  cursor:pointer;transition:all 0.15s;
+}
+.btn-logout:hover{border-color:var(--border3);color:var(--text)}
+
+/* ===== MAIN AREA ===== */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;background:var(--bg)}
+
+/* Header */
+.header{
+  height:52px;flex-shrink:0;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 16px;background:var(--bg);
+  position:sticky;top:0;z-index:10;
+}
+.header-left{display:flex;align-items:center;gap:10px}
+.hamburger{
+  width:34px;height:34px;border-radius:9px;
+  background:transparent;border:1px solid var(--border);
+  color:var(--text2);cursor:pointer;display:none;
+  align-items:center;justify-content:center;
+  transition:all 0.15s;flex-shrink:0;
+}
+.hamburger:hover{border-color:var(--border2);color:var(--text)}
+.header-model-name{font-size:14px;font-weight:600}
+.header-status{font-size:11px;color:var(--text2);margin-top:1px}
+
+.btn-save{
+  width:34px;height:34px;border-radius:9px;
+  background:transparent;border:1px solid var(--border);
+  color:var(--text2);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.15s;
+}
+.btn-save:hover{border-color:var(--border2);color:var(--text)}
+
+/* Messages */
+.messages{
+  flex:1;overflow-y:auto;padding:20px 16px;
+  display:flex;flex-direction:column;gap:14px;
+  scroll-behavior:smooth;
+}
+.messages::-webkit-scrollbar{width:4px}
+.messages::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* Welcome */
+.welcome{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;flex:1;text-align:center;padding:24px;
+  gap:12px;
+}
+.welcome-emblem{
+  width:56px;height:56px;border-radius:16px;
+  background:linear-gradient(145deg,#1e0505,#3d0a0a);
+  border:1.5px solid var(--gold);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 20px rgba(139,26,26,0.3);
+}
+.welcome h2{font-size:18px;font-weight:700}
+.welcome p{font-size:13px;color:var(--text2)}
+.quick-btns{display:flex;flex-wrap:wrap;justify-content:center;gap:7px;margin-top:4px}
+.quick-btn{
+  padding:7px 13px;border-radius:20px;
+  background:transparent;border:1px solid var(--border2);
+  color:var(--text2);font-size:12px;font-family:inherit;
+  cursor:pointer;transition:all 0.15s;
+}
+.quick-btn:hover{border-color:rgba(201,168,76,0.4);color:var(--gold)}
+
+/* Bubbles */
+.msg-row{display:flex;gap:8px;align-items:flex-end}
+.msg-row.user{flex-direction:row-reverse}
+.bubble{
+  max-width:78%;padding:10px 14px;font-size:14px;line-height:1.65;
+  border-radius:16px;word-break:break-word;
+}
+.bubble.ai{
+  background:var(--bg2);border:1px solid var(--border);
+  color:var(--text);border-bottom-left-radius:4px;
+}
+.bubble.user{
+  background:linear-gradient(135deg,var(--bubble-user-from),var(--bubble-user-to));
+  color:#fff;border-bottom-right-radius:4px;
+  border:1px solid rgba(255,255,255,0.06);
+}
+.bubble strong{font-weight:600}
+.bubble pre{
+  background:rgba(0,0,0,0.4);padding:10px;border-radius:8px;
+  overflow-x:auto;font-size:12px;margin-top:8px;border:1px solid var(--border2);
+  font-family:'SF Mono','Fira Code',monospace;
+}
+.bubble code{
+  background:rgba(255,255,255,0.08);padding:1px 5px;border-radius:4px;
+  font-size:12px;font-family:monospace;
+}
+.thinking-block{
+  max-width:78%;padding:10px 12px;
+  background:rgba(30,60,100,0.25);border:1px solid rgba(99,148,218,0.2);
+  border-left:3px solid #4a90d9;border-radius:10px;
+  font-size:12px;color:#8ab4d8;font-family:monospace;line-height:1.5;
+}
+.thinking-label{font-size:11px;font-weight:600;color:#6fa3d0;margin-bottom:4px;letter-spacing:0.3px}
+
+/* Typing */
+.typing-dots{display:flex;gap:4px;padding:4px 2px;align-items:center}
+.typing-dots span{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--text3);display:block;
+  animation:blink 1.2s infinite;
+}
+.typing-dots span:nth-child(2){animation-delay:0.2s}
+.typing-dots span:nth-child(3){animation-delay:0.4s}
+@keyframes blink{0%,80%,100%{opacity:0.2}40%{opacity:1}}
+
+/* Input */
+.input-bar{
+  border-top:1px solid var(--border);padding:12px 16px;
+  background:var(--bg1);flex-shrink:0;
+}
+.input-wrap{
+  display:flex;gap:8px;align-items:flex-end;
+  max-width:760px;margin:0 auto;
+}
+textarea{
+  flex:1;background:var(--bg2);border:1px solid var(--border2);
+  border-radius:12px;padding:11px 14px;
+  color:var(--text);font-size:14px;font-family:inherit;
+  resize:none;min-height:42px;max-height:120px;line-height:1.5;
+  outline:none;transition:border-color 0.15s;
+}
+textarea::placeholder{color:var(--text3)}
+textarea:focus{border-color:rgba(201,168,76,0.35)}
+.send-btn{
+  width:42px;height:42px;border-radius:12px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--red2),var(--red));
+  border:1px solid rgba(201,168,76,0.2);
+  color:#fff;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:opacity 0.15s,transform 0.1s;
+  box-shadow:0 2px 10px rgba(139,17,17,0.4);
+}
+.send-btn:hover{opacity:0.88}
+.send-btn:active{transform:scale(0.96)}
+.send-btn:disabled{opacity:0.35;cursor:not-allowed;transform:none}
+
+/* Overlay */
+.overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,0.7);z-index:40;
+}
+.overlay.show{display:block}
+
+/* ===== MOBILE ===== */
+@media(max-width:720px){
+  .sidebar{
+    position:fixed;left:0;top:0;bottom:0;z-index:50;
+    width:280px;transform:translateX(-100%);
+    box-shadow:4px 0 24px rgba(0,0,0,0.6);
+  }
+  .sidebar.open{transform:translateX(0)}
+  .hamburger{display:flex}
+  .messages{padding:16px 12px}
+  .bubble{max-width:88%}
+  .input-bar{padding:10px 12px;padding-bottom:calc(10px + env(safe-area-inset-bottom))}
+}
+
+/* Fade in messages */
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.msg-row,.thinking-block{animation:fadeUp 0.25s ease-out}
+</style>
 </head>
 <body>
-    <div class="app-container">
-        <div id="overlay" class="overlay" onclick="toggleSidebar()"></div>
-        
-        <aside id="sidebar" class="sidebar">
-            <div class="p-4 h-full flex flex-col">
-                <div class="w-12 h-1 bg-gray-700 rounded-full mx-auto mb-4 md:hidden"></div>
-                
-                <!-- User Profile -->
-                <div class="flex items-center gap-3 mb-4 pb-4 border-b border-gray-800">
-                    <div class="w-10 h-10 gradient-bg rounded-xl flex items-center justify-center flex-shrink-0">
-                        <span id="userInitial" class="font-bold">P</span>
-                    </div>
-                    <div class="min-w-0">
-                        <h3 id="userName" class="font-semibold text-sm truncate">Loading...</h3>
-                        <div class="flex items-center gap-2">
-                            <span id="userBadge" class="text-[10px] px-2 py-0.5 rounded-full bg-gray-700">Gen -</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Model Selection -->
-                <div class="mb-4">
-                    <h4 class="text-xs font-semibold text-gray-500 uppercase mb-2">Pilih Model AI</h4>
-                    
-                    <!-- Model Grid -->
-                    <div class="grid grid-cols-2 gap-2">
-                        <!-- Pagaska AI - Featured full width -->
-                        <button onclick="setModel('pagaska')" id="card-pagaska" class="model-card col-span-2 bg-red-950/60 text-red-100 border border-red-800/60">
-                            <div class="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0" style="background: radial-gradient(circle at 40% 35%, #B22222, #5a0000); border: 1px solid #C9A84C;">
-                                <svg viewBox="0 0 12 12" width="10" height="10"><polygon points="6,1 7.2,4.3 10.5,4.3 7.9,6.5 9,9.8 6,7.9 3,9.8 4.1,6.5 1.5,4.3 4.8,4.3" fill="#C9A84C"/></svg>
-                            </div>
-                            <div class="flex-1">
-                                <div class="font-semibold text-red-200">&#11088; Pagaska AI</div>
-                                <div class="text-[10px] text-red-400">Asisten resmi Gala Taksaka</div>
-                            </div>
-                        </button>
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
 
-                        <!-- Unlimited AI -->
-                        <button onclick="setModel('unlimited')" id="card-unlimited" class="model-card bg-gray-800/50 text-gray-300">
-                            <div class="model-icon bg-green-400"></div>
-                            <div>
-                                <div class="font-medium">Unlimited</div>
-                                <div class="text-[10px] text-gray-500">Cepat</div>
-                            </div>
-                        </button>
-                        
-                        <!-- GitaGPT -->
-                        <button onclick="setModel('gita')" id="card-gita" class="model-card bg-gray-800/50 text-gray-300">
-                            <div class="w-4 h-4 rounded-full spiritual-badge flex items-center justify-center text-[8px]">🕉️</div>
-                            <div>
-                                <div class="font-medium">GitaGPT</div>
-                                <div class="text-[10px] text-gray-500">Spiritual</div>
-                            </div>
-                        </button>
-                        
-                        <!-- GPT-4 -->
-                        <button onclick="setModel('gpt4')" id="card-gpt4" class="model-card bg-gray-800/50 text-gray-300">
-                            <div class="model-icon bg-red-400"></div>
-                            <div>
-                                <div class="font-medium">GPT-4</div>
-                                <div class="text-[10px] text-gray-500">OpenAI</div>
-                            </div>
-                        </button>
-                    </div>
-                
-                <!-- Chat History -->
-                <div class="flex-1 overflow-y-auto">
-                    <h4 class="text-xs font-semibold text-gray-500 uppercase mb-2">Riwayat Chat</h4>
-                    <div id="chatHistory" class="space-y-1">
-                        <div class="text-center py-4 text-gray-500 text-xs">Belum ada riwayat</div>
-                    </div>
-                </div>
-                
-                <!-- Actions -->
-                <div class="pt-4 border-t border-gray-800 space-y-2">
-                    <button onclick="newChat()" class="w-full py-2.5 gradient-bg rounded-xl text-sm font-medium flex items-center justify-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                        </svg>
-                        Chat Baru
-                    </button>
-                    <button onclick="logout()" class="w-full py-2.5 border border-gray-700 rounded-xl text-sm text-gray-400 hover:text-white">
-                        Keluar
-                    </button>
-                </div>
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-inner">
+
+      <!-- User profile -->
+      <div class="user-profile">
+        <div class="user-avatar" id="userInitial">P</div>
+        <div style="min-width:0">
+          <div class="user-name" id="userName">Loading...</div>
+          <span class="user-badge" id="userBadge">Gen —</span>
+        </div>
+      </div>
+
+      <!-- Models -->
+      <div>
+        <div class="section-label">Model AI</div>
+        <div class="model-list">
+
+          <button class="model-card active-pagaska" id="card-pagaska" onclick="setModel('pagaska')">
+            <div class="pagaska-icon">
+              <svg viewBox="0 0 16 16" width="12" height="12">
+                <polygon points="8,1 9.8,5.8 15,5.8 10.8,9 12.5,14 8,11 3.5,14 5.2,9 1,5.8 6.2,5.8" fill="#C9A84C"/>
+              </svg>
             </div>
-        </aside>
-
-        <!-- Main Chat -->
-        <main class="chat-area">
-            <header class="h-14 border-b border-gray-800 flex items-center justify-between px-4 bg-black/50 backdrop-blur-sm sticky top-0 z-20">
-                <div class="flex items-center gap-3">
-                    <button onclick="toggleSidebar()" class="p-2 -ml-2 hover:bg-gray-800 rounded-lg md:hidden">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                        </svg>
-                    </button>
-                    <div>
-                        <h1 class="font-semibold text-sm md:text-base" id="currentModel">Pagaska AI</h1>
-                        <p class="text-[10px] text-gray-400" id="modelStatus">Asisten resmi Gala Taksaka</p>
-                    </div>
-                </div>
-                <button onclick="saveChat()" class="p-2 hover:bg-gray-800 rounded-lg" title="Simpan chat">
-                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
-                    </svg>
-                </button>
-            </header>
-
-            <div id="messages" class="messages-container space-y-4">
-                <div class="text-center py-8 animate-fade-in">
-                    <div class="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg" style="background: radial-gradient(circle at 40% 35%, #B22222, #5a0000); border: 2px solid #C9A84C;">
-                        <svg viewBox="0 0 26 26" width="28" height="28" fill="none">
-                            <polygon points="13,2 15.5,9 23,9 17,14 19.5,21 13,17 6.5,21 9,14 3,9 10.5,9" fill="#C9A84C" stroke="#F0D080" stroke-width="0.5"/>
-                        </svg>
-                    </div>
-                    <h2 class="text-lg font-bold mb-1">Haloo, <span id="welcomeName">-</span>!</h2>
-                    <p class="text-gray-400 text-xs mb-4">AI Pagaska siap melayani. Ada yang ingin ditanyakan?</p>
-                    <div class="flex flex-wrap justify-center gap-2 px-4">
-                        <button onclick="quickAsk('Apa itu Pagaska Gala Taksaka?')" class="text-xs px-3 py-1.5 rounded-full border border-red-900 text-red-400 hover:bg-red-950 transition-colors">Apa itu Pagaska?</button>
-                        <button onclick="quickAsk('Bagaimana sejarah berdirinya Gala Taksaka?')" class="text-xs px-3 py-1.5 rounded-full border border-red-900 text-red-400 hover:bg-red-950 transition-colors">Sejarah</button>
-                        <button onclick="quickAsk('Apa makna nama Gala Taksaka?')" class="text-xs px-3 py-1.5 rounded-full border border-red-900 text-red-400 hover:bg-red-950 transition-colors">Makna nama</button>
-                        <button onclick="quickAsk('Apa visi dan misi Pagaska?')" class="text-xs px-3 py-1.5 rounded-full border border-red-900 text-red-400 hover:bg-red-950 transition-colors">Visi & Misi</button>
-                        <button onclick="quickAsk('Apa saja kegiatan rutin Pagaska?')" class="text-xs px-3 py-1.5 rounded-full border border-red-900 text-red-400 hover:bg-red-950 transition-colors">Kegiatan</button>
-                        <button onclick="quickAsk('Bagaimana cara mendaftar jadi anggota Pagaska?')" class="text-xs px-3 py-1.5 rounded-full border border-red-900 text-red-400 hover:bg-red-950 transition-colors">Cara daftar</button>
-                    </div>
-                </div>
+            <div class="model-card-text">
+              <div class="model-card-name" style="color:var(--gold2)">Pagaska AI</div>
+              <div class="model-card-sub">Asisten Gala Taksaka</div>
             </div>
+          </button>
 
-            <div class="input-container">
-                <div class="max-w-3xl mx-auto flex gap-2">
-                    <textarea 
-                        id="input" 
-                        rows="1"
-                        class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-sm resize-none outline-none focus:border-purple-500 max-h-24"
-                        placeholder="Ketik pesan..."
-                        onkeydown="handleKey(event)"
-                        oninput="resize(this)"
-                    ></textarea>
-                    <button onclick="send()" id="sendBtn" class="gradient-bg px-4 rounded-xl disabled:opacity-50">
-                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
-                        </svg>
-                    </button>
-                </div>
+          <button class="model-card" id="card-unlimited" onclick="setModel('unlimited')">
+            <div class="model-dot" style="background:#4ade80"></div>
+            <div class="model-card-text">
+              <div class="model-card-name">Unlimited AI</div>
+              <div class="model-card-sub">Cepat & ringan</div>
             </div>
-        </main>
+          </button>
 
-        <nav class="mobile-nav">
-            <button onclick="newChat()" class="flex flex-col items-center gap-1 p-2 text-gray-400 hover:text-white">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                </svg>
-                <span class="text-[10px]">Baru</span>
-            </button>
-            <button onclick="toggleSidebar()" class="flex flex-col items-center gap-1 p-2 text-gray-400 hover:text-white">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
-                </svg>
-                <span class="text-[10px]">Model</span>
-            </button>
-            <button onclick="logout()" class="flex flex-col items-center gap-1 p-2 text-gray-400 hover:text-red-400">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
-                </svg>
-                <span class="text-[10px]">Keluar</span>
-            </button>
-        </nav>
+          <button class="model-card" id="card-gita" onclick="setModel('gita')">
+            <div class="model-dot" style="background:#fb923c"></div>
+            <div class="model-card-text">
+              <div class="model-card-name">GitaGPT</div>
+              <div class="model-card-sub">Spiritual guide</div>
+            </div>
+          </button>
+
+          <button class="model-card" id="card-gpt4" onclick="setModel('gpt4')">
+            <div class="model-dot" style="background:#f87171"></div>
+            <div class="model-card-text">
+              <div class="model-card-name">GPT-4</div>
+              <div class="model-card-sub">OpenAI</div>
+            </div>
+          </button>
+
+        </div>
+      </div>
+
+      <!-- History -->
+      <div style="flex:1;display:flex;flex-direction:column;min-height:0">
+        <div class="section-label">Riwayat Chat</div>
+        <div class="history-list" id="chatHistory">
+          <div class="history-empty">Belum ada riwayat</div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="sidebar-actions">
+        <button class="btn-new" onclick="newChat()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+          Chat Baru
+        </button>
+        <button class="btn-logout" onclick="logout()">Keluar</button>
+      </div>
+
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <button class="hamburger" onclick="toggleSidebar()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <div>
+          <div class="header-model-name" id="headerModelName">Pagaska AI</div>
+          <div class="header-status" id="headerStatus">Asisten Gala Taksaka</div>
+        </div>
+      </div>
+      <button class="btn-save" onclick="saveChat()" title="Simpan chat">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+      </button>
+    </header>
+
+    <!-- Messages -->
+    <div class="messages" id="messages">
+      <div class="welcome" id="welcomeScreen">
+        <div class="welcome-emblem">
+          <svg viewBox="0 0 26 26" width="28" height="28">
+            <polygon points="13,2 15.5,9 23,9 17,14 19.5,21 13,17 6.5,21 9,14 3,9 10.5,9" fill="#C9A84C" stroke="#E8C96A" stroke-width="0.5"/>
+          </svg>
+        </div>
+        <div>
+          <h2>Hormat, <span id="welcomeName">—</span>!</h2>
+          <p>AI Pagaska siap melayani</p>
+        </div>
+        <div class="quick-btns" id="quickBtns">
+          <button class="quick-btn" onclick="quickAsk('Apa itu Pagaska Gala Taksaka?')">Apa itu Pagaska?</button>
+          <button class="quick-btn" onclick="quickAsk('Bagaimana sejarah berdirinya Gala Taksaka?')">Sejarah</button>
+          <button class="quick-btn" onclick="quickAsk('Apa makna nama Gala Taksaka?')">Makna nama</button>
+          <button class="quick-btn" onclick="quickAsk('Apa visi dan misi Pagaska?')">Visi & Misi</button>
+          <button class="quick-btn" onclick="quickAsk('Apa saja kegiatan rutin Pagaska?')">Kegiatan</button>
+          <button class="quick-btn" onclick="quickAsk('Cara mendaftar jadi anggota Pagaska?')">Cara daftar</button>
+        </div>
+      </div>
     </div>
 
-    <script>
-        // STATE & CONFIG
-        let currentModel = 'pagaska';
-        let isGenerating = false;
-        let messages = [];
-        let currentUser = null;
-        let conversationId = null;
+    <!-- Input -->
+    <div class="input-bar">
+      <div class="input-wrap">
+        <textarea id="msgInput" placeholder="Ketik pesan..." rows="1"
+          onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        <button class="send-btn" id="sendBtn" onclick="send()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </main>
+</div>
 
-        // Model configurations - 6 MODELS
-        const modelConfigs = {
-            pagaska: { name: '⭐ Pagaska AI', status: 'Asisten resmi Gala Taksaka', color: 'red' },
-            unlimited: { name: 'Unlimited AI', status: 'Cepat & Ringan', color: 'green' },
-            gita: { name: 'GitaGPT', status: 'Spiritual Guide', color: 'orange' },
-            gpt4: { name: 'GPT-4', status: 'OpenAI Power', color: 'red' }
-        };
+<script>
+// ===== STATE =====
+let currentModel = 'pagaska';
+let isGenerating = false;
+let messages = [];
+let currentUser = null;
+let conversationId = null;
 
-        // INIT
-        document.addEventListener('DOMContentLoaded', async () => {
-            const token = localStorage.getItem('pagaska_token');
-            if (!token) return window.location.href = '/login.html';
+const modelConfig = {
+  pagaska:   { name: 'Pagaska AI',   status: 'Asisten Gala Taksaka' },
+  unlimited: { name: 'Unlimited AI', status: 'Cepat & ringan' },
+  gita:      { name: 'GitaGPT',      status: 'Spiritual guide' },
+  gpt4:      { name: 'GPT-4',        status: 'OpenAI' },
+};
 
-            try {
-                const res = await fetch('/api/auth/me', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const data = await res.json();
-                if (!data.success) throw new Error('Auth failed');
-                
-                currentUser = data.user;
-                document.getElementById('userName').textContent = data.user.nama;
-                document.getElementById('userInitial').textContent = data.user.nama[0].toUpperCase();
-                document.getElementById('userBadge').textContent = `Gen ${data.user.generasi}`;
-                document.getElementById('welcomeName').textContent = data.user.nama.split(' ')[0];
-                
-                const colors = ['', 'bg-yellow-600', 'bg-gray-500', 'bg-orange-700', 'bg-blue-600'];
-                document.getElementById('userBadge').className = `text-[10px] px-2 py-0.5 rounded-full text-white ${colors[data.user.generasi] || 'bg-gray-600'}`;
-                
-            } catch (err) {
-                localStorage.removeItem('pagaska_token');
-                window.location.href = '/login.html';
-            }
-        });
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', async () => {
+  const token = localStorage.getItem('pagaska_token');
+  if (!token) return (window.location.href = '/login.html');
 
-        // UI FUNCTIONS
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('open');
-            document.getElementById('overlay').classList.toggle('show');
-        }
+  try {
+    const res = await fetch('/api/auth/me', { headers: { Authorization: `Bearer ${token}` } });
+    const data = await res.json();
+    if (!data.success) throw new Error();
 
-        function setModel(model) {
-            currentModel = model;
-            
-            // Update active card
-            document.querySelectorAll('.model-card').forEach(p => p.classList.remove('active'));
-            document.getElementById(`card-${model}`).classList.add('active');
-            
-            // Update header
-            const config = modelConfigs[model];
-            document.getElementById('currentModel').textContent = config.name;
-            document.getElementById('modelStatus').textContent = config.status;
-            
-            // Show/hide mode selectors
-            document.getElementById('deepseekMode').classList.toggle('hidden', model !== 'deepseek');
-            document.getElementById('geminiMode').classList.toggle('hidden', model !== 'gemini');
-            
-            if (window.innerWidth < 768) toggleSidebar();
-        }
+    currentUser = data.user;
+    const firstName = data.user.nama.split(' ')[0];
+    document.getElementById('userName').textContent = data.user.nama;
+    document.getElementById('userInitial').textContent = data.user.nama[0].toUpperCase();
+    document.getElementById('welcomeName').textContent = firstName;
 
-        function resize(el) {
-            el.style.height = 'auto';
-            el.style.height = Math.min(el.scrollHeight, 96) + 'px';
-        }
+    const badge = document.getElementById('userBadge');
+    badge.textContent = `Gen ${data.user.generasi}`;
+    const badgeColors = ['','#92400e','#374151','#713f12','#1e40af'];
+    badge.style.background = badgeColors[data.user.generasi] || '#1c1c1c';
+    badge.style.color = '#e5e7eb';
+    badge.style.borderColor = 'transparent';
+  } catch {
+    localStorage.removeItem('pagaska_token');
+    window.location.href = '/login.html';
+  }
+});
 
-        function handleKey(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                send();
-            }
-        }
+// ===== SIDEBAR =====
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('show');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+}
 
-        // CHAT FUNCTIONS
-        function addMessage(text, isUser = false, isThinking = false) {
-            const container = document.getElementById('messages');
-            
-            if (container.querySelector('.text-center')) {
-                container.innerHTML = '';
-            }
-            
-            const div = document.createElement('div');
-            div.className = `flex ${isUser ? 'justify-end' : 'justify-start'} animate-fade-in`;
-            
-            if (isThinking) {
-                div.innerHTML = `
-                    <div class="max-w-[85%] md:max-w-[70%] p-3 rounded-xl bg-blue-900/30 border-l-4 border-blue-500 text-xs text-blue-200 font-mono">
-                        <div class="font-semibold mb-1 text-blue-400">🧠 Thinking Process</div>
-                        ${escapeHtml(text)}
-                    </div>
-                `;
-            } else {
-                const bubbleClass = isUser ? 'bubble-user text-white' : 'bubble-ai text-gray-100';
-                div.innerHTML = `
-                    <div class="${bubbleClass} p-3 text-sm shadow-lg">
-                        ${isUser ? escapeHtml(text) : formatText(text)}
-                    </div>
-                `;
-            }
-            
-            container.appendChild(div);
-            container.scrollTop = container.scrollHeight;
-            messages.push({ role: isUser ? 'user' : 'assistant', content: text });
-        }
+// ===== MODEL SWITCH =====
+function setModel(model) {
+  currentModel = model;
+  document.querySelectorAll('.model-card').forEach(c => {
+    c.classList.remove('active', 'active-pagaska');
+  });
+  const card = document.getElementById(`card-${model}`);
+  card.classList.add(model === 'pagaska' ? 'active-pagaska' : 'active');
 
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
+  const cfg = modelConfig[model];
+  document.getElementById('headerModelName').textContent = cfg.name;
+  document.getElementById('headerStatus').textContent = cfg.status;
 
-        function formatText(text) {
-            return text
-                .replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>')
-                .replace(/```([\s\S]*?)```/g, '<pre class="bg-black/50 p-2 rounded mt-2 overflow-x-auto text-xs"><code>$1</code></pre>')
-                .replace(/`([^`]+)`/g, '<code class="bg-gray-700 px-1 rounded text-xs text-purple-300">$1</code>')
-                .replace(/\n/g, '<br>');
-        }
+  if (window.innerWidth <= 720) closeSidebar();
+}
 
-        function showTyping() {
-            const container = document.getElementById('messages');
-            const div = document.createElement('div');
-            div.id = 'typing';
-            div.className = 'flex justify-start';
-            div.innerHTML = `
-                <div class="bubble-ai p-4 flex gap-1">
-                    <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
-                    <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
-                    <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
-                </div>
-            `;
-            container.appendChild(div);
-            container.scrollTop = container.scrollHeight;
-        }
+// ===== QUICK ASK =====
+function quickAsk(text) {
+  if (currentModel !== 'pagaska') setModel('pagaska');
+  document.getElementById('msgInput').value = text;
+  send();
+}
 
-        // MAIN SEND FUNCTION - SUPPORTS 6 MODELS
-        async function send() {
-            const input = document.getElementById('input');
-            const text = input.value.trim();
-            if (!text || isGenerating) return;
+// ===== CHAT HELPERS =====
+function escHtml(t) {
+  const d = document.createElement('div');
+  d.textContent = t;
+  return d.innerHTML;
+}
+function fmtText(t) {
+  return t
+    .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>');
+}
 
-            addMessage(text, true);
-            input.value = '';
-            input.style.height = 'auto';
-            
-            showTyping();
-            isGenerating = true;
-            document.getElementById('sendBtn').disabled = true;
+function appendMsg(role, text, isThinking = false) {
+  const ws = document.getElementById('welcomeScreen');
+  if (ws) ws.remove();
 
-            try {
-                const token = localStorage.getItem('pagaska_token');
-                const body = { message: text };
-                
-                // Model-specific parameters
-                switch(currentModel) {
-                    case 'pixel':
-                        body.characterId = "6472508d-5763-415d-8d8e-db48c7fbd05a";
-                        body.conversationId = conversationId;
-                        break;
-                    case 'deepseek':
-                        body.mode = document.getElementById('deepseekMode').value;
-                        break;
-                    case 'gemini':
-                        body.model = document.getElementById('geminiMode').value;
-                        break;
-                    // gita, gpt4, pagaska tidak perlu parameter tambahan
-                }
+  const msgs = document.getElementById('messages');
 
-                const res = await fetch(`/api/${currentModel}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify(body)
-                });
+  if (isThinking) {
+    const d = document.createElement('div');
+    d.className = 'thinking-block';
+    d.innerHTML = `<div class="thinking-label">🧠 Thinking</div>${escHtml(text)}`;
+    msgs.appendChild(d);
+    msgs.scrollTop = msgs.scrollHeight;
+    return;
+  }
 
-                let data;
-                const contentType = res.headers.get('content-type');
-                
-                if (contentType && contentType.includes('application/json')) {
-                    data = await res.json();
-                } else {
-                    const text = await res.text();
-                    throw new Error(`Invalid response: ${text.substring(0, 100)}`);
-                }
+  const row = document.createElement('div');
+  row.className = `msg-row ${role}`;
+  const bub = document.createElement('div');
+  bub.className = `bubble ${role}`;
+  bub.innerHTML = role === 'user' ? escHtml(text) : fmtText(text);
+  row.appendChild(bub);
+  msgs.appendChild(row);
+  msgs.scrollTop = msgs.scrollHeight;
+  messages.push({ role: role === 'user' ? 'user' : 'assistant', content: text });
+}
 
-                document.getElementById('typing')?.remove();
+function showTyping() {
+  const msgs = document.getElementById('messages');
+  const row = document.createElement('div');
+  row.className = 'msg-row ai';
+  row.id = 'typingRow';
+  const bub = document.createElement('div');
+  bub.className = 'bubble ai';
+  bub.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+  row.appendChild(bub);
+  msgs.appendChild(row);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+function removeTyping() { document.getElementById('typingRow')?.remove(); }
 
-                if (!data.success) {
-                    throw new Error(data.error || 'Unknown error');
-                }
+// ===== SEND =====
+async function send() {
+  const input = document.getElementById('msgInput');
+  const text = input.value.trim();
+  if (!text || isGenerating) return;
 
-                // Handle different response formats
-                switch(currentModel) {
-                    case 'pixel':
-                        conversationId = data.conversation_id;
-                        addMessage(data.message, false);
-                        break;
-                    case 'deepseek':
-                        if (data.think) addMessage(data.think, false, true);
-                        addMessage(data.response, false);
-                        break;
-                    case 'gita':
-                        addMessage(data.response, false);
-                        break;
-                    default:
-                        // unlimited, gemini, gpt4
-                        addMessage(data.response, false);
-                }
+  input.value = '';
+  input.style.height = 'auto';
+  appendMsg('user', text);
+  showTyping();
+  isGenerating = true;
+  document.getElementById('sendBtn').disabled = true;
 
-            } catch (err) {
-                document.getElementById('typing')?.remove();
-                console.error('Send error:', err);
-                addMessage('❌ Error: ' + err.message, false);
-            } finally {
-                isGenerating = false;
-                document.getElementById('sendBtn').disabled = false;
-            }
-        }
+  try {
+    const token = localStorage.getItem('pagaska_token');
+    const body = { message: text };
+    if (currentModel === 'pixel') body.conversationId = conversationId;
 
-        // CHAT MANAGEMENT
-        function quickAsk(text) {
-            if (currentModel !== 'pagaska') setModel('pagaska');
-            document.getElementById('input').value = text;
-            send();
-        }
+    const res = await fetch(`/api/${currentModel}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify(body)
+    });
 
-        function newChat() {
-            document.getElementById('messages').innerHTML = `
-                <div class="text-center py-8 animate-fade-in">
-                    <div class="w-16 h-16 gradient-bg rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg">
-                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
-                        </svg>
-                    </div>
-                    <h2 class="text-lg font-bold mb-1">Chat Baru</h2>
-                    <p class="text-gray-400 text-xs">Mulai percakapan baru dengan ${modelConfigs[currentModel].name}</p>
-                </div>
-            `;
-            messages = [];
-            conversationId = null;
-            if (window.innerWidth < 768) toggleSidebar();
-        }
+    const data = await res.json();
+    removeTyping();
 
-        async function saveChat() {
-            if (messages.length === 0) return alert('Tidak ada chat untuk disimpan');
-            
-            try {
-                const token = localStorage.getItem('pagaska_token');
-                const res = await fetch('/api/chat/save', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ messages })
-                });
-                
-                const data = await res.json();
-                if (data.success) alert('Chat disimpan!');
-            } catch (err) {
-                alert('Gagal menyimpan: ' + err.message);
-            }
-        }
+    if (!data.success) throw new Error(data.error || 'Error');
 
-        function logout() {
-            localStorage.clear();
-            window.location.href = '/login.html';
-        }
-    </script>
+    if (currentModel === 'deepseek' && data.think) {
+      appendMsg('ai', data.think, true);
+    }
+    appendMsg('ai', data.response || data.message || '—');
+
+  } catch (err) {
+    removeTyping();
+    appendMsg('ai', '❌ ' + err.message);
+  } finally {
+    isGenerating = false;
+    document.getElementById('sendBtn').disabled = false;
+  }
+}
+
+// ===== KEY HANDLER =====
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+}
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+// ===== NEW CHAT =====
+function newChat() {
+  const msgs = document.getElementById('messages');
+  msgs.innerHTML = '';
+  const ws = document.createElement('div');
+  ws.className = 'welcome';
+  ws.id = 'welcomeScreen';
+  const name = currentUser?.nama?.split(' ')[0] || '—';
+  ws.innerHTML = `
+    <div class="welcome-emblem">
+      <svg viewBox="0 0 26 26" width="28" height="28"><polygon points="13,2 15.5,9 23,9 17,14 19.5,21 13,17 6.5,21 9,14 3,9 10.5,9" fill="#C9A84C" stroke="#E8C96A" stroke-width="0.5"/></svg>
+    </div>
+    <div><h2>Chat Baru</h2><p>Model aktif: ${modelConfig[currentModel].name}</p></div>`;
+  msgs.appendChild(ws);
+  messages = [];
+  conversationId = null;
+  if (window.innerWidth <= 720) closeSidebar();
+}
+
+// ===== SAVE =====
+async function saveChat() {
+  if (!messages.length) return alert('Tidak ada chat untuk disimpan');
+  try {
+    const token = localStorage.getItem('pagaska_token');
+    const res = await fetch('/api/chat/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ messages })
+    });
+    const data = await res.json();
+    if (data.success) alert('Chat disimpan!');
+  } catch (err) { alert('Gagal: ' + err.message); }
+}
+
+function logout() {
+  localStorage.clear();
+  window.location.href = '/login.html';
+}
+</script>
 </body>
 </html>

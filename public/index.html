@@ -671,12 +671,33 @@ async function loadHistory() {
       return;
     }
     container.innerHTML = data.chats.map(c => `
-      <div class="history-item" title="${c.preview || ''}">
-        <span style="font-size:10px;color:var(--text3);margin-right:5px">${c.model || '?'}</span>
-        ${c.preview || '(kosong)'}
+      <div class="history-item" onclick="openHistory(${JSON.stringify(c).replace(/"/g, '&quot;')})" title="${c.preview || ''}">
+        <div style="font-size:10px;color:var(--text3);margin-bottom:2px">${c.model || '?'} · ${new Date(c.savedAt).toLocaleDateString('id-ID',{day:'numeric',month:'short'})}</div>
+        <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.preview || '(kosong)'}</div>
       </div>
     `).join('');
   } catch {}
+}
+
+// ===== OPEN HISTORY =====
+function openHistory(chat) {
+  // Reset tampilan
+  const msgs = document.getElementById('messages');
+  msgs.innerHTML = '';
+  messages = [];
+
+  // Set model sesuai chat yang dibuka
+  if (chat.model && modelConfig[chat.model]) setModel(chat.model);
+
+  // Render semua pesan
+  chat.messages.forEach(m => {
+    appendMsg(m.role === 'user' ? 'user' : 'ai', m.content);
+  });
+
+  // Tandai ini history (tidak auto-save ulang)
+  messages = [...chat.messages];
+
+  if (window.innerWidth <= 720) closeSidebar();
 }
 
 function logout() {

@@ -3,7 +3,6 @@
 //  Base: chateverywhere.app (GPT-4) + System Prompt Doktrin
 // ============================================================
 
-// ⬇️ EDIT BAGIAN INI SESUAI DATA ASLI ORGANISASI
 const PAGASKA_DATA = {
   tahunBerdiri: "TAHUN_BERDIRI",
   motto: "MOTTO_ORGANISASI",

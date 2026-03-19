@@ -1,5 +1,35 @@
-// Data Generasi Pagaska (Pre-populated)
-const pagaskaGenerations = {
+const REDIS_URL   = process.env.UPSTASH_REDIS_REST_URL;
+const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
+
+// ─── Redis REST helper ───────────────────────────────────────
+async function redis(cmd, ...args) {
+  if (!REDIS_URL || !REDIS_TOKEN) {
+    throw new Error('Set UPSTASH_REDIS_REST_URL dan UPSTASH_REDIS_REST_TOKEN di Vercel environment variables');
+  }
+  const parts = [cmd, ...args.map(a =>
+    typeof a === 'object' ? JSON.stringify(a) : String(a)
+  )];
+  const res = await fetch(`${REDIS_URL}/${parts.map(p => encodeURIComponent(p)).join('/')}`, {
+    headers: { Authorization: `Bearer ${REDIS_TOKEN}` }
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(`Redis error: ${data.error}`);
+  return data.result;
+}
+
+const parse = v => { try { return JSON.parse(v); } catch { return v; } };
+
+async function rGet(key)              { const v = await redis('GET', key); return v ? parse(v) : null; }
+async function rSet(key, val)         { return redis('SET', key, JSON.stringify(val)); }
+async function rDel(key)              { return redis('DEL', key); }
+async function rLPush(key, val)       { return redis('LPUSH', key, JSON.stringify(val)); }
+async function rLRange(key, s, e)     { const a = await redis('LRANGE', key, s, e); return (a||[]).map(parse); }
+async function rLRem(key, cnt, val)   { return redis('LREM', key, cnt, JSON.stringify(val)); }
+async function rSAdd(key, val)        { return redis('SADD', key, val); }
+async function rSMembers(key)         { return (await redis('SMEMBERS', key)) || []; }
+async function rLTrim(key, s, e)      { return redis('LTRIM', key, s, e); }
+
+const MEMBERS = {
   1: [
     { nama: "Ryan Yazid Hidayat", jabatan: "Ketua Umum" },
     { nama: "Sekar Rutikasari", jabatan: "Wakil Ketua Umum" },
@@ -89,99 +119,119 @@ const pagaskaGenerations = {
   ]
 };
 
-// Inisialisasi database
-const users = new Map();
-const chats = new Map();
+const ADMIN_NAMES = ['Vanzz', 'Vex']; // ← EDIT INI
 
-// Register users dari generasi 1-3
-[1, 2, 3].forEach(gen => {
-  if (pagaskaGenerations[gen]) {
-    pagaskaGenerations[gen].forEach((user, idx) => {
-      const id = `gen${gen}_${idx}`;
-      users.set(id, {
-        id,
-        nama: user.nama,
-        jabatan: user.jabatan,
-        generasi: gen,
-        tipe: 'jabatan',
-        createdAt: new Date().toISOString()
-      });
-    });
-  }
-});
-
-// Register generasi 4
-if (pagaskaGenerations[4]) {
-  pagaskaGenerations[4].forEach((user, idx) => {
-    const id = `gen4_${idx}`;
-    users.set(id, {
-      id,
-      nama: user.nama,
-      jabatan: user.jabatan,
-      generasi: 4,
-      tipe: 'gratis',
-      createdAt: new Date().toISOString()
-    });
-  });
+function makeUserId(nama, gen) {
+  return `u:${gen}:${nama.toLowerCase().replace(/\s+/g,'_')}`;
 }
 
-console.log(`Loaded ${users.size} users from database`);
+// ─── Auth ────────────────────────────────────────────────────
+async function findUserByCredentials(nama, jabatan, generasi) {
+  const gen = parseInt(generasi);
+  const namaTrim = nama.trim();
+  const jabatanTrim = jabatan.trim();
 
-// Export functions
-module.exports = {
-  users,
-  chats,
-  
-  findUserByCredentials(nama, jabatan, generasi) {
-    console.log('Finding user:', { nama, jabatan, generasi });
-    
-    for (const [id, user] of users) {
-      if (user.generasi !== parseInt(generasi)) continue;
-      
-      if (user.generasi === 4) {
-        // Gen 4: cek nama + jabatan "Anggota"
-        if (user.jabatan.toLowerCase() === jabatan.toLowerCase() && 
-            user.nama.toLowerCase() === nama.toLowerCase()) {
-          console.log('Found user (Gen 4):', user);
-          return user;
-        }
-      } else {
-        // Gen 1-3: cek nama + jabatan
-        if (user.nama.toLowerCase() === nama.toLowerCase() && 
-            user.jabatan.toLowerCase() === jabatan.toLowerCase()) {
-          console.log('Found user (Gen 1-3):', user);
-          return user;
-        }
-      }
+  if (gen === 4) {
+    if (jabatanTrim.toLowerCase() !== 'anggota') return null;
+    const userId = makeUserId(namaTrim, 4);
+    let user = await rGet(`user:${userId}`);
+    if (!user) {
+      user = {
+        id: userId, nama: namaTrim, jabatan: 'Anggota',
+        generasi: 4, tipe: 'gratis', isAdmin: false,
+        createdAt: new Date().toISOString()
+      };
+      await rSet(`user:${userId}`, user);
+      await rSAdd('idx:users', userId);
     }
-    console.log('User not found');
-    return null;
-  },
-
-  saveChat(userId, messages) {
-    const userChats = chats.get(userId) || [];
-    const chatSession = {
-      id: Date.now().toString(),
-      userId,
-      messages,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-    userChats.push(chatSession);
-    chats.set(userId, userChats);
-    return chatSession;
-  },
-
-  getUserChats(userId) {
-    return chats.get(userId) || [];
-  },
-
-  deleteChat(userId, chatId) {
-    const userChats = chats.get(userId) || [];
-    const filtered = userChats.filter(c => c.id !== chatId);
-    chats.set(userId, filtered);
-    return true;
+    return user;
   }
+
+  const list = MEMBERS[gen] || [];
+  const match = list.find(
+    m => m.nama.toLowerCase() === namaTrim.toLowerCase() &&
+         m.jabatan.toLowerCase() === jabatanTrim.toLowerCase()
+  );
+  if (!match) return null;
+
+  const userId = makeUserId(match.nama, gen);
+  let user = await rGet(`user:${userId}`);
+  if (!user) {
+    user = {
+      id: userId, nama: match.nama, jabatan: match.jabatan,
+      generasi: gen, tipe: 'jabatan',
+      isAdmin: ADMIN_NAMES.includes(match.nama),
+      createdAt: new Date().toISOString()
+    };
+    await rSet(`user:${userId}`, user);
+    await rSAdd('idx:users', userId);
+  }
+  return user;
+}
+
+async function getUserById(userId) {
+  return rGet(`user:${userId}`);
+}
+
+// ─── Chat ────────────────────────────────────────────────────
+async function saveChat(userId, messages, model) {
+  const user = await rGet(`user:${userId}`);
+  const chatId = `chat:${Date.now()}:${Math.random().toString(36).slice(2,6)}`;
+  const chat = {
+    id: chatId,
+    userId,
+    userName: user?.nama || userId,
+    userGen: user?.generasi || '?',
+    model: model || 'unknown',
+    messages,
+    preview: messages.find(m => m.role === 'user')?.content?.slice(0, 100) || '—',
+    msgCount: messages.length,
+    savedAt: new Date().toISOString()
+  };
+
+  await rSet(chatId, chat);
+  await rLPush(`idx:chats:user:${userId}`, chatId);
+  await rLTrim(`idx:chats:user:${userId}`, 0, 49);   // max 50 per user
+  await rLPush('idx:chats:all', chatId);
+  await rLTrim('idx:chats:all', 0, 999);              // max 1000 global
+
+  return chat;
+}
+
+async function getUserChats(userId, limit = 30) {
+  const ids = await rLRange(`idx:chats:user:${userId}`, 0, limit - 1);
+  const chats = await Promise.all(ids.map(id => rGet(id)));
+  return chats.filter(Boolean);
+}
+
+async function getAllChats(limit = 200) {
+  const ids = await rLRange('idx:chats:all', 0, limit - 1);
+  const chats = await Promise.all(ids.map(id => rGet(id)));
+  return chats.filter(Boolean);
+}
+
+async function deleteChat(chatId) {
+  const chat = await rGet(chatId);
+  if (!chat) return false;
+  await rDel(chatId);
+  await rLRem(`idx:chats:user:${chat.userId}`, 0, chatId);
+  await rLRem('idx:chats:all', 0, chatId);
+  return true;
+}
+
+async function getAllUsers(limit = 200) {
+  const ids = await rSMembers('idx:users');
+  const users = await Promise.all(ids.slice(0, limit).map(id => rGet(`user:${id}`)));
+  return users.filter(Boolean).sort((a,b) => (a.generasi - b.generasi));
+}
+
+module.exports = {
+  findUserByCredentials,
+  getUserById,
+  saveChat,
+  getUserChats,
+  getAllChats,
+  deleteChat,
+  getAllUsers,
+  ADMIN_NAMES,
 };
-
-

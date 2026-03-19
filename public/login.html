@@ -1,327 +1,302 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Login - Pagaska AI</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        * { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        
-        body {
-            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 50%, #16213e 100%);
-            min-height: 100vh;
-        }
-        
-        .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .gradient-text {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        
-        .input-field {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s;
-        }
-        
-        .input-field:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-        
-        .gen-card {
-            transition: all 0.3s;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .gen-card:hover, .gen-card.active {
-            border-color: #667eea;
-            background: rgba(102, 126, 234, 0.1);
-            transform: translateY(-2px);
-        }
-        
-        .slide-up { animation: slideUp 0.4s ease-out; }
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .fade-in { animation: fadeIn 0.5s ease-out; }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        /* Mobile optimizations */
-        @media (max-width: 640px) {
-            .container-padding { padding: 1rem; }
-            .gen-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
-        }
-    </style>
-</head>
-<body class="text-white flex items-center justify-center p-4">
-    <div class="w-full max-w-md mx-auto">
-        <!-- Logo Section -->
-        <div class="text-center mb-6 fade-in">
-            <div class="w-16 h-16 gradient-bg rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg shadow-purple-500/30">
-                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.131A8 8 0 008 8m0 0a8 8 0 00-8 8c0 2.472.345 4.865.99 7.131M8 8a8 8 0 0016 0m0 0a8 8 0 00-8-8m0 0a8 8 0 00-8 8"/>
-                </svg>
-            </div>
-            <h1 class="text-2xl font-bold gradient-text">Pagaska AI</h1>
-            <p class="text-gray-400 text-sm mt-1">Sistem Informasi Generasi</p>
-        </div>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Login — Pagaska AI</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0a;
+  --bg1:#111;
+  --bg2:#181818;
+  --bg3:#222;
+  --border:#2a2a2a;
+  --border2:#333;
+  --text:#f0ece4;
+  --text2:#888;
+  --text3:#555;
+  --red:#9b1111;
+  --red2:#c0392b;
+  --gold:#c9a84c;
+  --gold2:#e8c96a;
+  --accent:#8b1a1a;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;font-size:14px;line-height:1.5;-webkit-tap-highlight-color:transparent}
+body{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100dvh;padding:20px}
 
-        <!-- Step 1: Pilih Generasi -->
-        <div id="step1" class="glass-card rounded-2xl p-5 fade-in">
-            <h2 class="text-lg font-semibold mb-4 text-center">Pilih Generasi Anda</h2>
-            
-            <div class="gen-grid grid grid-cols-2 gap-3">
-                <button onclick="selectGenerasi(1)" class="gen-card p-4 rounded-xl bg-gray-800/50 text-center">
-                    <div class="text-2xl mb-1">🥇</div>
-                    <div class="font-semibold text-sm">Generasi 1</div>
-                    <div class="text-xs text-gray-400">Pendiri</div>
-                </button>
-                
-                <button onclick="selectGenerasi(2)" class="gen-card p-4 rounded-xl bg-gray-800/50 text-center">
-                    <div class="text-2xl mb-1">🥈</div>
-                    <div class="font-semibold text-sm">Generasi 2</div>
-                    <div class="text-xs text-gray-400">Penerus</div>
-                </button>
-                
-                <button onclick="selectGenerasi(3)" class="gen-card p-4 rounded-xl bg-gray-800/50 text-center">
-                    <div class="text-2xl mb-1">🥉</div>
-                    <div class="font-semibold text-sm">Generasi 3</div>
-                    <div class="text-xs text-gray-400">Pengembang</div>
-                </button>
-                
-                <button onclick="selectGenerasi(4)" class="gen-card p-4 rounded-xl bg-gray-800/50 text-center">
-                    <div class="text-2xl mb-1">⭐</div>
-                    <div class="font-semibold text-sm">Generasi 4</div>
-                    <div class="text-xs text-gray-400">Anggota Baru</div>
-                </button>
-            </div>
+/* ---- LOGO ---- */
+.logo-wrap{text-align:center;margin-bottom:28px}
+.emblem{
+  width:60px;height:60px;border-radius:16px;
+  background:linear-gradient(145deg,#1e0505,#3d0a0a);
+  border:1.5px solid var(--gold);
+  display:inline-flex;align-items:center;justify-content:center;
+  margin-bottom:12px;
+  box-shadow:0 0 24px rgba(139,26,26,0.4);
+}
+.logo-wrap h1{font-size:22px;font-weight:700;letter-spacing:-0.5px;color:var(--text)}
+.logo-wrap h1 span{color:var(--gold)}
+.logo-wrap p{font-size:12px;color:var(--text2);margin-top:3px;letter-spacing:0.3px}
 
-            <!-- Debug info -->
-            <div class="mt-4 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
-                <p class="text-xs text-yellow-400 text-center">
-                    💡 Data Login Test:<br>
-                    Gen 1-3: Nama + Jabatan<br>
-                    Gen 4: Nama + "Anggota"
-                </p>
-            </div>
-        </div>
-
-        <!-- Step 2: Form Login -->
-        <div id="step2" class="glass-card rounded-2xl p-5 hidden slide-up">
-            <div class="flex items-center gap-3 mb-5">
-                <button onclick="backToStep1()" class="p-2 hover:bg-gray-700 rounded-lg transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                    </svg>
-                </button>
-                <div>
-                    <h2 class="text-lg font-semibold">Login Gen <span id="genNumber"></span></h2>
-                    <p class="text-xs text-gray-400" id="loginTypeText">Masukkan data Anda</p>
-                </div>
-            </div>
-
-            <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-1.5">Nama Lengkap</label>
-                    <input 
-                        type="text" 
-                        id="nama" 
-                        required
-                        class="input-field w-full px-4 py-3 rounded-xl text-white placeholder-gray-500 outline-none text-sm"
-                        placeholder="Contoh: Ahmad Fauzi"
-                    >
-                </div>
-
-                <div id="jabatanContainer">
-                    <label class="block text-sm font-medium text-gray-300 mb-1.5">Jabatan</label>
-                    <input 
-                        type="text" 
-                        id="jabatan" 
-                        required
-                        class="input-field w-full px-4 py-3 rounded-xl text-white placeholder-gray-500 outline-none text-sm"
-                        placeholder="Contoh: Ketua Umum"
-                    >
-                </div>
-
-                <div id="infoGen4" class="hidden p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
-                    <p class="text-xs text-blue-400">
-                        ℹ️ Generasi 4 otomatis menggunakan jabatan "Anggota"
-                    </p>
-                </div>
-
-                <button 
-                    type="submit" 
-                    id="loginBtn"
-                    class="w-full gradient-bg text-white font-semibold py-3 rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2 mt-6"
-                >
-                    <span id="btnText">Masuk</span>
-                    <svg id="btnIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
-                    </svg>
-                    <div id="btnLoading" class="hidden w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                </button>
-            </form>
-
-            <div id="errorMsg" class="mt-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg hidden">
-                <p class="text-red-400 text-sm text-center" id="errorText"></p>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        let selectedGenerasi = null;
-        const API_URL = ''; // Kosong untuk relative path
-
-        function selectGenerasi(gen) {
-            selectedGenerasi = gen;
-            
-            document.getElementById('step1').classList.add('hidden');
-            document.getElementById('step2').classList.remove('hidden');
-            document.getElementById('genNumber').textContent = gen;
-            
-            const isGen4 = gen === 4;
-            const jabatanInput = document.getElementById('jabatan');
-            const jabatanContainer = document.getElementById('jabatanContainer');
-            const infoGen4 = document.getElementById('infoGen4');
-            
-            if (isGen4) {
-                jabatanContainer.classList.add('hidden');
-                jabatanInput.value = 'Anggota';
-                infoGen4.classList.remove('hidden');
-                document.getElementById('loginTypeText').textContent = 'Akses Anggota Gratis';
-            } else {
-                jabatanContainer.classList.remove('hidden');
-                jabatanInput.value = '';
-                infoGen4.classList.add('hidden');
-                document.getElementById('loginTypeText').textContent = 'Login dengan Nama & Jabatan';
-            }
-            
-            setTimeout(() => document.getElementById('nama').focus(), 100);
-        }
-
-        function backToStep1() {
-            document.getElementById('step2').classList.add('hidden');
-            document.getElementById('step1').classList.remove('hidden');
-            document.getElementById('errorMsg').classList.add('hidden');
-            selectedGenerasi = null;
-        }
-
-async function handleLogin(e) {
-    e.preventDefault();
-    
-    const nama = document.getElementById('nama').value.trim();
-    const jabatan = document.getElementById('jabatan').value.trim();
-    
-    // UI Loading state
-    const btn = document.getElementById('loginBtn');
-    const btnText = document.getElementById('btnText');
-    const btnIcon = document.getElementById('btnIcon');
-    const btnLoading = document.getElementById('btnLoading');
-    
-    btn.disabled = true;
-    btnText.textContent = 'Memproses...';
-    btnIcon.classList.add('hidden');
-    btnLoading.classList.remove('hidden');
-    document.getElementById('errorMsg').classList.add('hidden');
-
-    try {
-        console.log('Sending login request:', { nama, jabatan, generasi: selectedGenerasi });
-        
-        const res = await fetch(`${API_URL}/api/auth/login`, {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify({ nama, jabatan, generasi: selectedGenerasi })
-        });
-        
-        console.log('Response status:', res.status);
-        
-        let data;
-        const contentType = res.headers.get('content-type');
-        
-        if (!res.ok) {
-            // Jika status error, coba baca sebagai text dulu
-            const errorText = await res.text();
-            console.error('Error response:', errorText);
-            
-            // Coba parse sebagai JSON jika bisa
-            try {
-                const errorJson = JSON.parse(errorText);
-                throw new Error(errorJson.error || errorJson.message || `Error ${res.status}: ${errorText}`);
-            } catch (parseErr) {
-                // Jika bukan JSON, tampilkan text langsung
-                throw new Error(`Server error ${res.status}: ${errorText.substring(0, 100)}`);
-            }
-        }
-        
-        if (contentType && contentType.includes('application/json')) {
-            data = await res.json();
-        } else {
-            const text = await res.text();
-            console.error('Non-JSON response:', text.substring(0, 200));
-            throw new Error('Server returned non-JSON response');
-        }
-        
-        console.log('Response data:', data);
-        
-        if (data.success) {
-            localStorage.setItem('pagaska_token', data.token);
-            localStorage.setItem('pagaska_user', JSON.stringify(data.user));
-            window.location.href = '/';
-        } else {
-            throw new Error(data.error || 'Login gagal');
-        }
-    } catch (err) {
-        console.error('Login error:', err);
-        
-        // PERBAIKAN: Pastikan error ditampilkan sebagai string
-        let errorMessage = 'Terjadi kesalahan';
-        
-        if (typeof err === 'string') {
-            errorMessage = err;
-        } else if (err instanceof Error) {
-            errorMessage = err.message;
-        } else if (typeof err === 'object') {
-            // Jika object, coba ekstrak message atau error
-            errorMessage = err.message || err.error || JSON.stringify(err);
-        }
-        
-        document.getElementById('errorText').textContent = errorMessage;
-        document.getElementById('errorMsg').classList.remove('hidden');
-        
-        // Reset button
-        btn.disabled = false;
-        btnText.textContent = 'Masuk';
-        btnIcon.classList.remove('hidden');
-        btnLoading.classList.add('hidden');
-    }
+/* ---- CARD ---- */
+.card{
+  width:100%;max-width:380px;
+  background:var(--bg1);
+  border:1px solid var(--border);
+  border-radius:16px;
+  overflow:hidden;
 }
 
-        // Check if already logged in
-        if (localStorage.getItem('pagaska_token')) {
-            window.location.href = '/';
-        }
-    </script>
+/* ---- STEP 1: Pilih Generasi ---- */
+#step1{padding:20px}
+#step1 h2{font-size:14px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:14px;text-align:center}
+.gen-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.gen-btn{
+  padding:14px 10px;border-radius:12px;
+  background:var(--bg2);border:1px solid var(--border);
+  color:var(--text);cursor:pointer;text-align:center;
+  transition:border-color 0.15s,background 0.15s,transform 0.1s;
+  position:relative;overflow:hidden;
+}
+.gen-btn:hover{border-color:var(--border2);background:var(--bg3)}
+.gen-btn.active{border-color:var(--gold);background:rgba(201,168,76,0.06)}
+.gen-btn:active{transform:scale(0.97)}
+.gen-num{font-size:18px;font-weight:700;color:var(--gold);display:block;margin-bottom:2px}
+.gen-label{font-size:12px;font-weight:500}
+.gen-sub{font-size:10px;color:var(--text3);margin-top:1px}
+
+/* ---- STEP 2: Form ---- */
+#step2{display:none}
+.form-header{
+  padding:16px 20px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+}
+.back-btn{
+  width:30px;height:30px;border-radius:8px;
+  background:var(--bg2);border:1px solid var(--border);
+  color:var(--text2);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:all 0.15s;
+}
+.back-btn:hover{border-color:var(--border2);color:var(--text)}
+.form-header-text h3{font-size:15px;font-weight:600}
+.form-header-text p{font-size:11px;color:var(--text2)}
+
+.form-body{padding:20px}
+.form-body .form-group{margin-bottom:14px}
+label{display:block;font-size:12px;font-weight:500;color:var(--text2);margin-bottom:6px;letter-spacing:0.2px}
+input[type=text]{
+  width:100%;padding:11px 14px;
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:10px;color:var(--text);font-size:14px;font-family:inherit;
+  outline:none;transition:border-color 0.15s,box-shadow 0.15s;
+}
+input[type=text]::placeholder{color:var(--text3)}
+input[type=text]:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,0.1)}
+
+.info-box{
+  padding:10px 12px;border-radius:9px;
+  background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);
+  font-size:11px;color:var(--gold);margin-bottom:14px;display:none;
+}
+
+.submit-btn{
+  width:100%;padding:13px;border-radius:11px;
+  background:linear-gradient(135deg,var(--red2),var(--red));
+  border:1px solid rgba(201,168,76,0.2);
+  color:#fff;font-size:14px;font-weight:600;font-family:inherit;
+  cursor:pointer;transition:opacity 0.15s,transform 0.1s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  margin-top:6px;
+}
+.submit-btn:hover{opacity:0.9}
+.submit-btn:active{transform:scale(0.99)}
+.submit-btn:disabled{opacity:0.5;cursor:not-allowed}
+.spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.error-box{
+  padding:10px 12px;border-radius:9px;
+  background:rgba(192,57,43,0.1);border:1px solid rgba(192,57,43,0.3);
+  font-size:12px;color:#e74c3c;margin-top:12px;display:none;text-align:center;
+}
+
+/* ---- DIVIDER ---- */
+.divider{height:1px;background:var(--border);margin:16px 0}
+
+/* ---- ANIMATIONS ---- */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.card{animation:fadeUp 0.35s ease-out both}
+.logo-wrap{animation:fadeUp 0.35s ease-out 0.05s both}
+</style>
+</head>
+<body>
+
+<div class="logo-wrap">
+  <div class="emblem">
+    <svg viewBox="0 0 32 32" width="30" height="30" fill="none">
+      <polygon points="16,2 19.5,11.5 30,11.5 21.5,18 25,27.5 16,21.5 7,27.5 10.5,18 2,11.5 12.5,11.5" fill="#C9A84C" stroke="#E8C96A" stroke-width="0.8"/>
+    </svg>
+  </div>
+  <h1>Pagaska <span>AI</span></h1>
+  <p>Paskibra Gala Taksaka · SMKN 5 Madiun</p>
+</div>
+
+<div class="card">
+
+  <!-- Step 1 -->
+  <div id="step1">
+    <h2>Pilih Generasi</h2>
+    <div class="gen-grid">
+      <button class="gen-btn" onclick="selectGenerasi(1)">
+        <span class="gen-num">I</span>
+        <span class="gen-label">Generasi 1</span>
+        <div class="gen-sub">Pendiri</div>
+      </button>
+      <button class="gen-btn" onclick="selectGenerasi(2)">
+        <span class="gen-num">II</span>
+        <span class="gen-label">Generasi 2</span>
+        <div class="gen-sub">Penerus</div>
+      </button>
+      <button class="gen-btn" onclick="selectGenerasi(3)">
+        <span class="gen-num">III</span>
+        <span class="gen-label">Generasi 3</span>
+        <div class="gen-sub">Pengembang</div>
+      </button>
+      <button class="gen-btn" onclick="selectGenerasi(4)">
+        <span class="gen-num">IV</span>
+        <span class="gen-label">Generasi 4</span>
+        <div class="gen-sub">Anggota Baru</div>
+      </button>
+    </div>
+  </div>
+
+  <!-- Step 2 -->
+  <div id="step2">
+    <div class="form-header">
+      <button class="back-btn" onclick="backToStep1()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 18l-6-6 6-6"/>
+        </svg>
+      </button>
+      <div class="form-header-text">
+        <h3>Login Generasi <span id="genNumber"></span></h3>
+        <p id="loginTypeText">Masukkan data Anda</p>
+      </div>
+    </div>
+
+    <div class="form-body">
+      <div class="form-group">
+        <label>Nama Lengkap</label>
+        <input type="text" id="nama" placeholder="Contoh: Ahmad Fauzi" autocomplete="name">
+      </div>
+
+      <div id="jabatanContainer" class="form-group">
+        <label>Jabatan</label>
+        <input type="text" id="jabatan" placeholder="Contoh: Ketua Umum">
+      </div>
+
+      <div class="info-box" id="infoGen4">
+        Generasi 4 otomatis menggunakan jabatan "Anggota"
+      </div>
+
+      <button class="submit-btn" id="loginBtn" onclick="handleLogin()">
+        <span id="btnText">Masuk</span>
+        <svg id="btnIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+        <div class="spinner" id="btnLoading"></div>
+      </button>
+
+      <div class="error-box" id="errorMsg">
+        <span id="errorText"></span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+let selectedGenerasi = null;
+
+function selectGenerasi(gen) {
+  selectedGenerasi = gen;
+  document.getElementById('step1').style.display = 'none';
+  document.getElementById('step2').style.display = 'block';
+  document.getElementById('genNumber').textContent = ['','I','II','III','IV'][gen];
+
+  const isGen4 = gen === 4;
+  const jContainer = document.getElementById('jabatanContainer');
+  const jInput = document.getElementById('jabatan');
+  const info = document.getElementById('infoGen4');
+
+  if (isGen4) {
+    jContainer.style.display = 'none';
+    jInput.value = 'Anggota';
+    info.style.display = 'block';
+    document.getElementById('loginTypeText').textContent = 'Akses Anggota Gratis';
+  } else {
+    jContainer.style.display = 'block';
+    jInput.value = '';
+    info.style.display = 'none';
+    document.getElementById('loginTypeText').textContent = 'Login dengan Nama & Jabatan';
+  }
+  setTimeout(() => document.getElementById('nama').focus(), 80);
+}
+
+function backToStep1() {
+  document.getElementById('step2').style.display = 'none';
+  document.getElementById('step1').style.display = 'block';
+  document.getElementById('errorMsg').style.display = 'none';
+  selectedGenerasi = null;
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('step2').style.display !== 'none') handleLogin();
+});
+
+async function handleLogin() {
+  const nama = document.getElementById('nama').value.trim();
+  const jabatan = document.getElementById('jabatan').value.trim();
+  if (!nama) return document.getElementById('nama').focus();
+
+  const btn = document.getElementById('loginBtn');
+  const btnText = document.getElementById('btnText');
+  const btnIcon = document.getElementById('btnIcon');
+  const btnLoading = document.getElementById('btnLoading');
+
+  btn.disabled = true;
+  btnText.textContent = 'Memproses...';
+  btnIcon.style.display = 'none';
+  btnLoading.style.display = 'block';
+  document.getElementById('errorMsg').style.display = 'none';
+
+  try {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ nama, jabatan, generasi: selectedGenerasi })
+    });
+    const data = await res.json();
+    if (data.success) {
+      localStorage.setItem('pagaska_token', data.token);
+      localStorage.setItem('pagaska_user', JSON.stringify(data.user));
+      window.location.href = '/';
+    } else {
+      throw new Error(data.error || 'Login gagal');
+    }
+  } catch (err) {
+    document.getElementById('errorText').textContent = err.message;
+    document.getElementById('errorMsg').style.display = 'block';
+    btn.disabled = false;
+    btnText.textContent = 'Masuk';
+    btnIcon.style.display = 'inline';
+    btnLoading.style.display = 'none';
+  }
+}
+
+if (localStorage.getItem('pagaska_token')) window.location.href = '/';
+</script>
 </body>
 </html>
-

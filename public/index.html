@@ -207,14 +207,32 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 }
 .bubble strong{font-weight:600}
 .bubble pre{
-  background:rgba(0,0,0,0.4);padding:10px;border-radius:8px;
-  overflow-x:auto;font-size:12px;margin-top:8px;border:1px solid var(--border2);
-  font-family:'SF Mono','Fira Code',monospace;
+  background:rgba(0,0,0,0.4);padding:10px;border-radius:0 0 8px 8px;
+  overflow-x:auto;font-size:12px;margin:0;border:1px solid var(--border2);
+  border-top:none;
+  font-family:'SF Mono','Fira Code',monospace;white-space:pre;
 }
 .bubble code{
   background:rgba(255,255,255,0.08);padding:1px 5px;border-radius:4px;
   font-size:12px;font-family:monospace;
 }
+.code-block{
+  margin:8px 0;border-radius:8px;
+  border:1px solid var(--border2);overflow:hidden;
+}
+.code-block .code-lang{
+  display:inline-block;font-size:10px;padding:4px 10px;
+  background:rgba(0,0,0,0.5);color:var(--text2);
+  font-family:monospace;border-bottom:1px solid var(--border2);
+}
+.code-block .copy-btn{
+  float:right;font-size:11px;padding:4px 8px;
+  background:transparent;border:none;color:var(--text2);
+  cursor:pointer;font-family:monospace;
+  background:rgba(0,0,0,0.5);border-bottom:1px solid var(--border2);
+}
+.code-block .copy-btn:hover{color:var(--text);}
+.code-block pre{margin:0;border:none;border-radius:0;}
 .thinking-block{
   max-width:78%;padding:10px 12px;
   background:rgba(30,60,100,0.25);border:1px solid rgba(99,148,218,0.2);
@@ -347,6 +365,14 @@ textarea:focus{border-color:rgba(201,168,76,0.35)}
             </div>
           </button>
 
+          <button class="model-card" id="card-sonnet" onclick="setModel('sonnet')">
+            <div class="model-dot" style="background:#a78bfa"></div>
+            <div class="model-card-text">
+              <div class="model-card-name">Claude Sonnet</div>
+              <div class="model-card-sub">Anthropic AI</div>
+            </div>
+          </button>
+
         </div>
       </div>
 
@@ -433,10 +459,11 @@ let currentUser = null;
 let conversationId = null;
 
 const modelConfig = {
-  pagaska:   { name: 'Pagaska AI',   status: 'Asisten Gala Taksaka' },
-  unlimited: { name: 'Unlimited AI', status: 'Cepat & ringan' },
-  gita:      { name: 'GitaGPT',      status: 'Spiritual guide' },
-  gpt4:      { name: 'GPT-4',        status: 'OpenAI' },
+  pagaska:   { name: 'Pagaska AI',      status: 'Asisten Gala Taksaka' },
+  unlimited: { name: 'Unlimited AI',    status: 'Cepat & ringan' },
+  gita:      { name: 'GitaGPT',         status: 'Spiritual guide' },
+  gpt4:      { name: 'GPT-4',           status: 'OpenAI' },
+  sonnet:    { name: 'Claude Sonnet',   status: 'Anthropic AI' },
 };
 
 // ===== INIT =====
@@ -507,12 +534,47 @@ function escHtml(t) {
   d.textContent = t;
   return d.innerHTML;
 }
+function escHtmlStr(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
 function fmtText(t) {
-  return t
-    .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
-    .replace(/`([^`]+)`/g, '<code>$1</code>')
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\n/g, '<br>');
+  // Extract code blocks first, replace with placeholder
+  const codeBlocks = [];
+  t = t.replace(/```(\w*)\n?([\s\S]*?)```/g, (_, lang, code) => {
+    const idx = codeBlocks.length;
+    const langLabel = lang ? `<span class="code-lang">${escHtmlStr(lang)}</span>` : '';
+    const copyBtn = `<button class="copy-btn" onclick="copyCode(this)" title="Copy">⧉</button>`;
+    codeBlocks.push(`<div class="code-block">${langLabel}${copyBtn}<pre><code>${escHtmlStr(code.trimEnd())}</code></pre></div>`);
+    return `\x00CODEBLOCK${idx}\x00`;
+  });
+  // Escape remaining HTML
+  t = escHtmlStr(t);
+  // Inline code
+  t = t.replace(/`([^`]+)`/g, '<code>$1</code>');
+  // Bold & italic
+  t = t.replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>');
+  t = t.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  t = t.replace(/\*(.*?)\*/g, '<em>$1</em>');
+  // Headers
+  t = t.replace(/^### (.+)$/gm, '<h4 style="margin:8px 0 4px;font-size:13px;font-weight:700">$1</h4>');
+  t = t.replace(/^## (.+)$/gm, '<h3 style="margin:8px 0 4px;font-size:14px;font-weight:700">$1</h3>');
+  t = t.replace(/^# (.+)$/gm, '<h2 style="margin:8px 0 4px;font-size:15px;font-weight:700">$1</h2>');
+  // Unordered list items
+  t = t.replace(/^[-•] (.+)$/gm, '<li style="margin-left:16px;list-style:disc">$1</li>');
+  // Numbered list
+  t = t.replace(/^\d+\. (.+)$/gm, '<li style="margin-left:16px;list-style:decimal">$1</li>');
+  // Newlines
+  t = t.replace(/\n/g, '<br>');
+  // Restore code blocks
+  t = t.replace(/\x00CODEBLOCK(\d+)\x00/g, (_, i) => codeBlocks[parseInt(i)]);
+  return t;
+}
+function copyCode(btn) {
+  const code = btn.closest('.code-block').querySelector('code').textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    btn.textContent = '✓';
+    setTimeout(() => btn.textContent = '⧉', 1800);
+  });
 }
 
 function appendMsg(role, text, isThinking = false) {
@@ -570,10 +632,10 @@ async function send() {
 
   try {
     const token = localStorage.getItem('pagaska_token');
-    const body = { message: text };
+    const body = { message: text, model: currentModel };
     if (currentModel === 'pixel') body.conversationId = conversationId;
 
-    const res = await fetch(`/api/${currentModel}`, {
+    const res = await fetch(`/api/ai`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify(body)
